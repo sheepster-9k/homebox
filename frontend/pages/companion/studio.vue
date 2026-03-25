@@ -90,12 +90,22 @@
 
     <!-- Step: Review -->
     <div v-if="store.currentStep === 'review'" class="space-y-4">
+      <ItemReviewTable
+        v-if="reviewViewMode === 'table'"
+        :items="store.detectedItems"
+        :locations="locations"
+        @exclude="store.excludeItem($event)"
+        @restore="store.restoreItem($event)"
+        @toggle-view="reviewViewMode = 'grid'"
+      />
       <ItemGrid
+        v-else
         :items="store.detectedItems"
         :selected-item-id="store.selectedItemId"
         @select="store.selectedItemId = $event"
         @exclude="store.excludeItem($event)"
         @restore="store.restoreItem($event)"
+        @toggle-view="reviewViewMode = 'table'"
       />
 
       <!-- Selected item detail panel -->
@@ -202,6 +212,7 @@
   import DetectionCanvas from "@/components/Studio/DetectionCanvas.vue";
   import ItemGrid from "@/components/Studio/ItemGrid.vue";
   import BatchActionBar from "@/components/Studio/BatchActionBar.vue";
+  import ItemReviewTable from "@/components/Studio/ItemReviewTable.vue";
   import SessionManager from "@/components/Studio/SessionManager.vue";
 
   definePageMeta({ middleware: ["auth"] });
@@ -216,6 +227,7 @@
   const importErrors = ref<string[]>([]);
   const activeFrameIndex = ref(0);
   const isReanalyzing = ref(false);
+  const reviewViewMode = ref<"grid" | "table">("grid");
 
   // Items for the currently displayed frame in the detection canvas
   const itemsForActiveFrame = computed(() => {
