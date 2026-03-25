@@ -11,6 +11,7 @@
   import MdiPlusBoxMultipleOutline from "~icons/mdi/plus-box-multiple-outline";
   import MdiContentSaveEdit from "~icons/mdi/content-save-edit";
   import MdiDotsVertical from "~icons/mdi/dots-vertical";
+  import MdiRobotHappy from "~icons/mdi/robot-happy";
   import { Separator } from "@/components/ui/separator";
   import {
     DropdownMenu,
@@ -57,6 +58,12 @@
   const route = useRoute();
   const router = useRouter();
   const api = useUserApi();
+  const { isEnabled: companionEnabled, getPageUrl: companionUrl } = useCompanion();
+
+  function openCompanionChat() {
+    const name = item.value?.name || "this item";
+    navigateTo(`/companion/chat?context=Tell me about the item "${name}" in my inventory`);
+  }
 
   const itemId = computed<string>(() => route.params.id as string);
   const preferences = useViewPreferences();
@@ -729,6 +736,10 @@
                   <DropdownMenuItem @click="saveAsTemplate">
                     <MdiContentSaveEdit class="mr-2 size-4" />
                     {{ $t("components.template.save_as_template") }}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem v-if="companionEnabled" @click="openCompanionChat">
+                    <MdiRobotHappy class="mr-2 size-4" />
+                    {{ $t("companion.ai_analyze") }}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem class="text-destructive focus:text-destructive" @click="deleteItem">

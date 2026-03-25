@@ -240,6 +240,7 @@
   import MdiLogout from "~icons/mdi/logout";
   import MdiFileDocumentMultiple from "~icons/mdi/file-document-multiple";
   import MdiChevronRight from "~icons/mdi/chevron-right";
+  import MdiRobotHappy from "~icons/mdi/robot-happy";
 
   import {
     Sidebar,
@@ -434,6 +435,33 @@
       active: computed(() => route.path === "/profile"),
       name: computed(() => t("menu.profile")),
       to: "/profile",
+    },
+    {
+      icon: MdiRobotHappy,
+      id: 8,
+      active: computed(() => route.path.includes("/companion")),
+      name: computed(() => t("companion.title")),
+      to: "/companion",
+      collapsible: [
+        {
+          id: 81,
+          active: computed(() => route.path === "/companion/chat"),
+          name: computed(() => t("companion.chat.title")),
+          to: "/companion/chat",
+        },
+        {
+          id: 82,
+          active: computed(() => route.path === "/companion/capture"),
+          name: computed(() => t("companion.capture.title")),
+          to: "/companion/capture",
+        },
+        {
+          id: 83,
+          active: computed(() => route.path === "/companion/qr"),
+          name: computed(() => t("companion.qr.title")),
+          to: "/companion/qr",
+        },
+      ],
     },
     {
       icon: MdiCog,

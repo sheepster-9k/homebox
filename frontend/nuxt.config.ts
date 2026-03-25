@@ -36,6 +36,8 @@ export default defineNuxtConfig({
       otelServiceVersion: process.env.NUXT_PUBLIC_OTEL_SERVICE_VERSION || "1.0.0",
       otelSampleRate: process.env.NUXT_PUBLIC_OTEL_SAMPLE_RATE || "1.0",
       otelDebug: process.env.NUXT_PUBLIC_OTEL_DEBUG || "false",
+      // Homebox Companion (HBC) URL - set to enable AI features
+      hbcUrl: process.env.NUXT_PUBLIC_HBC_URL || "",
     },
   },
 
