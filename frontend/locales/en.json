@@ -67,6 +67,13 @@
             "review": "Review",
             "import": "Import"
         },
+        "canvas": {
+            "title": "Detection Canvas",
+            "add_region": "Add Region",
+            "reanalyze": "Re-analyze",
+            "reanalyzing": "Analyzing...",
+            "draw_hint": "Draw a rectangle around an item to analyze it individually"
+        },
         "fields": {
             "name": "Name",
             "quantity": "Quantity",
