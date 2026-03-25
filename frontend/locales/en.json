@@ -18,12 +18,33 @@
         "capture": {
             "title": "Snap & Catalog",
             "description": "Take photos to auto-identify and catalog items into your inventory",
-            "open": "Open Camera"
+            "drop_hint": "Drop an image here or click to select",
+            "formats": "JPG, PNG, WebP — max 10MB",
+            "take_photo": "Take Photo",
+            "upload": "Upload Image",
+            "single_item": "Treat as a single item",
+            "instructions_hint": "Optional: describe what's in the photo...",
+            "analyze": "Analyze with AI",
+            "analyzing": "Analyzing...",
+            "retake": "Clear",
+            "found_items": "{count} item(s) detected",
+            "scan_another": "Scan Another",
+            "duplicate": "Possible Duplicate",
+            "new_item": "New"
         },
         "qr": {
             "title": "QR Scanner",
             "description": "Scan QR codes and barcodes to look up or create items",
-            "open": "Open Scanner"
+            "scanning": "Point camera at a QR code or barcode...",
+            "initializing": "Camera initializing...",
+            "start": "Start Scanner",
+            "stop": "Stop",
+            "result": "Scanned",
+            "resolved": "Resolved URL",
+            "resolving": "Resolving URL...",
+            "open_item": "Open Item",
+            "open_link": "Open Link",
+            "scan_again": "Scan Again"
         },
         "back": "Back to Companion"
     },
