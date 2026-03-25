@@ -34,6 +34,12 @@ type Config struct {
 	Otel       OTelConfig     `yaml:"otel"`
 	Auth       AuthConfig     `yaml:"auth"`
 	Notifier   NotifierConf   `yaml:"notifier"`
+	Companion  CompanionConf  `yaml:"companion"`
+}
+
+type CompanionConf struct {
+	Enabled bool   `yaml:"enabled" conf:"default:false"`
+	URL     string `yaml:"url"     conf:"default:http://hbc-internal:8000"`
 }
 
 type Options struct {

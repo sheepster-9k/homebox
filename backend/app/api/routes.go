@@ -211,6 +211,11 @@ func (a *app) mountRoutes(r *chi.Mux, chain *errchain.ErrChain, repos *repo.AllR
 		// Reporting Services
 		r.Get("/reporting/bill-of-materials", chain.ToHandlerFunc(v1Ctrl.HandleBillOfMaterialsExport(), userMW...))
 
+		// AI Companion (HBC) reverse proxy
+		if a.conf.Companion.Enabled {
+			r.HandleFunc("/companion/*", chain.ToHandlerFunc(v1Ctrl.HandleCompanionProxy(a.conf.Companion.URL), userMW...))
+		}
+
 		// OpenTelemetry proxy endpoint for frontend telemetry (requires auth)
 		if a.otel != nil && a.otel.IsEnabled() && a.conf.Otel.ProxyEnabled {
 			r.Post("/telemetry", chain.ToHandlerFunc(func(w http.ResponseWriter, r *http.Request) error {
