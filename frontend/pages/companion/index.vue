@@ -67,11 +67,17 @@
           </Card>
         </NuxtLink>
       </div>
+
+      <!-- Affine Integration Settings -->
+      <div class="pt-4">
+        <BridgeSettings />
+      </div>
     </div>
   </BaseContainer>
 </template>
 
 <script setup lang="ts">
+  import BridgeSettings from "@/components/Affine/BridgeSettings.vue";
   import MdiRobotConfused from "~icons/mdi/robot-confused";
   import MdiCloudOffOutline from "~icons/mdi/cloud-off-outline";
   import MdiChatProcessing from "~icons/mdi/chat-processing";

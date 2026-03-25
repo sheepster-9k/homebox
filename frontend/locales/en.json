@@ -48,6 +48,14 @@
         },
         "back": "Back to Companion"
     },
+    "affine": {
+        "title": "Affine Integration",
+        "connected": "Connected",
+        "unreachable": "Unreachable",
+        "not_configured": "Not Configured",
+        "create_page": "Create Affine Page",
+        "view_page": "View in Affine"
+    },
     "studio": {
         "title": "AI Studio",
         "description": "Bulk capture, detect, review, and import items from photos",
