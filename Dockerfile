@@ -17,8 +17,14 @@ WORKDIR /app
 RUN npm install -g pnpm@10
 
 # Copy over source files and node_modules from dependencies stage
-COPY frontend . 
+COPY frontend .
 COPY --from=frontend-dependencies /app/node_modules ./node_modules
+
+# HBC URL can be set at build time for pre-configured deployments,
+# or discovered at runtime via localStorage / companion-config.json
+ARG NUXT_PUBLIC_HBC_URL=""
+ENV NUXT_PUBLIC_HBC_URL=${NUXT_PUBLIC_HBC_URL}
+
 RUN pnpm build
 
 # Go dependencies stage
