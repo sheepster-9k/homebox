@@ -98,8 +98,6 @@
   const loading = ref(true);
 
   onMounted(async () => {
-    // Ensure URL discovery completes before checking availability
-    await discoverHbcUrl();
     if (isEnabled.value) {
       const available = await companion.checkAvailability();
       if (available) {

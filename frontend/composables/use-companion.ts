@@ -37,68 +37,20 @@ interface ChatMessage {
   content: string;
 }
 
-// Module-level cache so discovery only runs once per page load
-const _discoveredUrl = ref<string | null>(null);
-const _discoveryDone = ref(false);
-
-export async function discoverHbcUrl(): Promise<string> {
-  if (_discoveryDone.value) return _discoveredUrl.value || "";
-
-  // 1. Check localStorage (user override / persisted config)
-  if (typeof window !== "undefined") {
-    const stored = localStorage.getItem("hbc_url");
-    if (stored) {
-      _discoveredUrl.value = stored;
-      _discoveryDone.value = true;
-      return stored;
-    }
-  }
-
-  // 2. Try fetching /api/companion-config.json (static file in Homebox data dir)
-  try {
-    const resp = await fetch("/api/companion-config.json", { signal: AbortSignal.timeout(3000) });
-    if (resp.ok) {
-      const data = await resp.json();
-      if (data.url) {
-        _discoveredUrl.value = data.url;
-        _discoveryDone.value = true;
-        // Cache in localStorage for faster subsequent loads
-        if (typeof window !== "undefined") localStorage.setItem("hbc_url", data.url);
-        return data.url;
-      }
-    }
-  } catch {
-    // Not configured via static file, continue
-  }
-
-  // 3. Nuxt build-time fallback
-  try {
-    const runtimeConfig = useRuntimeConfig();
-    const buildTimeUrl = runtimeConfig.public.hbcUrl as string;
-    if (buildTimeUrl) {
-      _discoveredUrl.value = buildTimeUrl;
-      _discoveryDone.value = true;
-      return buildTimeUrl;
-    }
-  } catch {
-    // runtimeConfig not available
-  }
-
-  _discoveryDone.value = true;
-  return "";
-}
-
 export function useCompanion() {
-  const hbcUrl = computed(() => _discoveredUrl.value || "");
+  // Read HBC URL: localStorage override > Nuxt runtimeConfig (baked at build time)
+  const runtimeConfig = useRuntimeConfig();
+  const hbcUrl = computed(() => {
+    if (typeof window !== "undefined") {
+      const override = localStorage.getItem("hbc_url");
+      if (override) return override;
+    }
+    return (runtimeConfig.public.hbcUrl as string) || "";
+  });
 
   const isEnabled = computed(() => !!hbcUrl.value);
   const isAvailable = ref(false);
   const config = ref<HBCConfig | null>(null);
-
-  // Trigger discovery on first use
-  if (!_discoveryDone.value) {
-    discoverHbcUrl();
-  }
 
   /**
    * Get the auth token from the current user context.
