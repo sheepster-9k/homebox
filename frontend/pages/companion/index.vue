@@ -80,19 +80,25 @@
 
   definePageMeta({ middleware: ["auth"] });
 
-  const { isEnabled, isAvailable, checkAvailability, getPageUrl } = useCompanion();
+  const companion = useCompanion();
+  const { isEnabled, isAvailable } = companion;
   const version = ref("");
+  const loading = ref(true);
 
   onMounted(async () => {
-    const available = await checkAvailability();
-    if (available) {
-      try {
-        const { hbcFetch } = useCompanion();
-        const data = await hbcFetch<{ version: string }>("/api/version");
-        version.value = data.version;
-      } catch {
-        // ignore
+    // Ensure URL discovery completes before checking availability
+    await discoverHbcUrl();
+    if (isEnabled.value) {
+      const available = await companion.checkAvailability();
+      if (available) {
+        try {
+          const data = await companion.hbcFetch<{ version: string }>("/api/version");
+          version.value = data.version;
+        } catch {
+          // ignore
+        }
       }
     }
+    loading.value = false;
   });
 </script>
