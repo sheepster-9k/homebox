@@ -17,12 +17,15 @@
         },
         "capture": {
             "title": "Snap & Catalog",
-            "description": "Take photos to auto-identify and catalog items into your inventory"
+            "description": "Take photos to auto-identify and catalog items into your inventory",
+            "open": "Open Camera"
         },
         "qr": {
             "title": "QR Scanner",
-            "description": "Scan QR codes and barcodes to look up or create items"
-        }
+            "description": "Scan QR codes and barcodes to look up or create items",
+            "open": "Open Scanner"
+        },
+        "back": "Back to Companion"
     },
     "collection": {
         "copy_invite": "Copy Invite Link",
