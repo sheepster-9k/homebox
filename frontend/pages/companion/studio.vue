@@ -295,7 +295,7 @@
         store.addDetectedItems(frame.id, items);
       }
       store.goToStep("detection");
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Analysis failed:", e);
       studioError.value = e?.message || "Analysis failed";
     } finally {
@@ -326,7 +326,7 @@
         }));
         store.addDetectedItems(frame.id, items);
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Region analysis failed:", e);
       studioError.value = e?.message || "Region analysis failed";
     } finally {
@@ -353,7 +353,7 @@
           croppedImageData: cropped,
         });
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Re-analysis failed:", e);
       studioError.value = e?.message || "Re-analysis failed";
     } finally {
@@ -399,7 +399,7 @@
 
       store.importProgress = items.length;
       store.goToStep("import");
-    } catch (e: any) {
+    } catch (e: unknown) {
       importErrors.value = [e.message || "Batch import failed"];
     } finally {
       store.isImporting = false;

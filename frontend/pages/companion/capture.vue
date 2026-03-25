@@ -115,7 +115,7 @@
   const singleItem = ref(false);
   const extraInstructions = ref("");
   const analyzing = ref(false);
-  const results = ref<any>(null);
+  const results = ref<{ items: { name: string; description?: string; location?: string; quantity: number; tags?: string[]; duplicate?: boolean }[] } | null>(null);
   const error = ref("");
 
   function triggerUpload() {
@@ -162,8 +162,8 @@
         singleItem: singleItem.value,
         extraInstructions: extraInstructions.value || undefined,
       });
-    } catch (e: any) {
-      error.value = e.message || "Analysis failed";
+    } catch (e: unknown) {
+      error.value = e instanceof Error ? e.message : "Analysis failed";
     } finally {
       analyzing.value = false;
     }

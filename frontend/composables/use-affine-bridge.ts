@@ -93,8 +93,6 @@ export function useAffineBridge() {
       // For now, log the generated markdown
       // Full doc creation requires CRDT update format which is complex
       // TODO: Implement via Affine's doc creation API when available
-      console.log("Generated Affine doc markdown for:", item.name);
-      console.log(_markdown);
 
       // Placeholder: return a fake doc ID
       // Real implementation would use applyDocUpdates mutation
@@ -118,7 +116,6 @@ export function useAffineBridge() {
 
     try {
       const _markdown = locationToMarkdown(location);
-      console.log("Generated Affine doc for location:", location.name);
       return `affine-loc-${location.id}`;
     } catch (e) {
       console.error("Failed to create Affine location doc:", e);
@@ -140,7 +137,6 @@ export function useAffineBridge() {
         ...data,
         generatedAt: new Date().toLocaleString(),
       });
-      console.log("Generated inventory report");
       return `affine-report-${Date.now()}`;
     } catch (e) {
       console.error("Failed to create inventory report:", e);
