@@ -48,6 +48,12 @@
           >
             <MdiCheck class="size-3" />
           </Badge>
+          <button
+            class="absolute -left-1 -top-1 flex size-5 items-center justify-center rounded-full bg-destructive text-[10px] text-destructive-foreground shadow-sm hover:bg-destructive/80"
+            @click.stop="removeFrame(frame.id)"
+          >
+            <MdiClose class="size-3" />
+          </button>
         </div>
       </div>
     </div>
@@ -63,6 +69,7 @@
   import MdiCamera from "~icons/mdi/camera";
   import MdiUpload from "~icons/mdi/upload";
   import MdiCheck from "~icons/mdi/check";
+  import MdiClose from "~icons/mdi/close";
   import { Badge } from "@/components/ui/badge";
   import { Button } from "@/components/ui/button";
   import { useStudioStore } from "@/stores/studio";
@@ -73,6 +80,10 @@
   const fileInput = ref<HTMLInputElement | null>(null);
   const cameraInput = ref<HTMLInputElement | null>(null);
   const isDragOver = ref(false);
+
+  function removeFrame(id: string) {
+    store.removeFrame(id);
+  }
 
   function triggerUpload() {
     fileInput.value?.click();

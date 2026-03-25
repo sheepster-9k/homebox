@@ -95,6 +95,11 @@ export const useStudioStore = defineStore("studio", () => {
     return id;
   }
 
+  function removeFrame(frameId: string) {
+    frames.value = frames.value.filter(f => f.id !== frameId);
+    detectedItems.value = detectedItems.value.filter(i => i.frameId !== frameId);
+  }
+
   function addDetectedItems(frameId: string, items: Partial<StudioItem>[]) {
     for (const item of items) {
       detectedItems.value.push({
@@ -182,7 +187,7 @@ export const useStudioStore = defineStore("studio", () => {
     // Computed
     activeItems, importableItems, importedCount, selectedItem,
     // Actions
-    addFrame, addDetectedItems, updateItem, excludeItem, restoreItem,
+    addFrame, removeFrame, addDetectedItems, updateItem, excludeItem, restoreItem,
     markImported, setLocationForAll, goToStep, reset,
   };
 });
