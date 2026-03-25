@@ -194,6 +194,7 @@
 </template>
 
 <script setup lang="ts">
+  import { useI18n } from "vue-i18n";
   import MdiArrowLeft from "~icons/mdi/arrow-left";
   import MdiRefresh from "~icons/mdi/refresh";
   import MdiMagnifyScan from "~icons/mdi/magnify-scan";
