@@ -13,7 +13,6 @@
         </div>
       </div>
 
-      <!-- Embedded HBC QR page -->
       <div class="overflow-hidden rounded-lg border">
         <iframe
           :src="qrUrl"
@@ -31,5 +30,10 @@
   definePageMeta({ middleware: ["auth"] });
 
   const { getPageUrl } = useCompanion();
-  const qrUrl = computed(() => getPageUrl("/qr"));
+  const authCtx = useAuthContext();
+  const qrUrl = computed(() => {
+    const token = authCtx.token.value;
+    const base = getPageUrl("/qr");
+    return token ? `${base}?hb_token=${encodeURIComponent(token)}` : base;
+  });
 </script>

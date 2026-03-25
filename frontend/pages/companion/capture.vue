@@ -13,7 +13,6 @@
         </div>
       </div>
 
-      <!-- Embedded HBC Capture page -->
       <div class="overflow-hidden rounded-lg border">
         <iframe
           :src="captureUrl"
@@ -31,5 +30,10 @@
   definePageMeta({ middleware: ["auth"] });
 
   const { getPageUrl } = useCompanion();
-  const captureUrl = computed(() => getPageUrl("/capture"));
+  const authCtx = useAuthContext();
+  const captureUrl = computed(() => {
+    const token = authCtx.token.value;
+    const base = getPageUrl("/capture");
+    return token ? `${base}?hb_token=${encodeURIComponent(token)}` : base;
+  });
 </script>
