@@ -68,6 +68,10 @@
     debounceTimer = setTimeout(() => search(), 300);
   }
 
+  onUnmounted(() => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+  });
+
   async function search() {
     if (!query.value.trim() || !isEnabled.value) return;
     isSearching.value = true;

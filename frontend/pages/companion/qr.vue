@@ -78,8 +78,7 @@
 
   definePageMeta({ middleware: ["auth"] });
 
-  const { hbcUrl } = useCompanion();
-  const authCtx = useAuthContext();
+  const { hbcFetch } = useCompanion();
 
   const videoEl = ref<HTMLVideoElement | null>(null);
   const scanning = ref(false);
@@ -159,23 +158,15 @@
     if (text.includes("bit.ly") || text.includes("t.co") || text.length < 50) {
       resolving.value = true;
       try {
-        const token = authCtx.token.value;
-        const headers: Record<string, string> = { "Content-Type": "application/json" };
-        if (token) headers.Authorization = `Bearer ${token}`;
-
-        const resp = await fetch(`${hbcUrl.value}/api/qr/resolve`, {
+        const data = await hbcFetch<{ resolved_url: string }>("/api/qr/resolve", {
           method: "POST",
-          headers,
           body: JSON.stringify({ url: text }),
         });
-        if (resp.ok) {
-          const data = await resp.json();
-          resolvedUrl.value = data.resolved_url;
-          // Check resolved URL for item pattern
-          const resolvedMatch = data.resolved_url.match(/\/item\/([a-f0-9-]+)/i);
-          if (resolvedMatch) {
-            itemUrl.value = `/item/${resolvedMatch[1]}`;
-          }
+        resolvedUrl.value = data.resolved_url;
+        // Check resolved URL for item pattern
+        const resolvedMatch = data.resolved_url.match(/\/item\/([a-f0-9-]+)/i);
+        if (resolvedMatch) {
+          itemUrl.value = `/item/${resolvedMatch[1]}`;
         }
       } catch {
         // Resolve failed, show raw URL

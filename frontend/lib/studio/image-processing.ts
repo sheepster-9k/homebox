@@ -3,12 +3,12 @@
  * Uses Canvas API for crop extraction — no server round-trip needed.
  */
 
-export interface CropBounds {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import type { Bounds } from "./canvas-math";
+
+/**
+ * @deprecated Use `Bounds` from `canvas-math.ts` instead.
+ */
+export type CropBounds = Bounds;
 
 /**
  * Load an image from a base64 data URL or blob URL.

@@ -104,6 +104,7 @@
       const reader = stream.getReader();
       const decoder = new TextDecoder();
       let assistantMsg = "";
+      let sseBuffer = "";
       messages.value.push({ role: "assistant", content: "" });
       const msgIdx = messages.value.length - 1;
 
@@ -111,9 +112,13 @@
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
+        sseBuffer += decoder.decode(value, { stream: true });
+        // Split on newlines; keep the last incomplete line in the buffer
+        const lines = sseBuffer.split("\n");
+        sseBuffer = lines.pop() || "";
+
         // Parse SSE events
-        for (const line of chunk.split("\n")) {
+        for (const line of lines) {
           if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));

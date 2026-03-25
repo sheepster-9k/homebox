@@ -106,8 +106,7 @@
 
   definePageMeta({ middleware: ["auth"] });
 
-  const { hbcUrl } = useCompanion();
-  const authCtx = useAuthContext();
+  const { detectItems } = useCompanion();
 
   const fileInput = ref<HTMLInputElement | null>(null);
   const cameraInput = ref<HTMLInputElement | null>(null);
@@ -159,25 +158,10 @@
     error.value = "";
 
     try {
-      const formData = new FormData();
-      formData.append("image", imageFile.value);
-      formData.append("single_item", String(singleItem.value));
-      if (extraInstructions.value) {
-        formData.append("extra_instructions", extraInstructions.value);
-      }
-
-      const token = authCtx.token.value;
-      const headers: Record<string, string> = {};
-      if (token) headers.Authorization = `Bearer ${token}`;
-
-      const resp = await fetch(`${hbcUrl.value}/api/tools/vision/detect`, {
-        method: "POST",
-        headers,
-        body: formData,
+      results.value = await detectItems(imageFile.value, {
+        singleItem: singleItem.value,
+        extraInstructions: extraInstructions.value || undefined,
       });
-
-      if (!resp.ok) throw new Error(`Detection failed: ${resp.status}`);
-      results.value = await resp.json();
     } catch (e: any) {
       error.value = e.message || "Analysis failed";
     } finally {

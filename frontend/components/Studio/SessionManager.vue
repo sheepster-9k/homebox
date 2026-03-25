@@ -103,7 +103,7 @@
         detectedItems: store.detectedItems,
       },
       store.detectedItems.length,
-      thumbnail ? thumbnail.substring(0, 500) : "", // Tiny thumbnail for list
+      "", // Thumbnail not stored; placeholder icon used in list
     );
     sessions.value = await listSessions();
     saveMessage.value = "Session saved";

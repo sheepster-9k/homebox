@@ -95,7 +95,6 @@
   const companion = useCompanion();
   const { isEnabled, isAvailable } = companion;
   const version = ref("");
-  const loading = ref(true);
 
   onMounted(async () => {
     if (isEnabled.value) {
@@ -109,6 +108,5 @@
         }
       }
     }
-    loading.value = false;
   });
 </script>

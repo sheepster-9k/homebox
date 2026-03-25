@@ -17,8 +17,11 @@ interface StoredSession {
   data: string; // JSON-serialized full session state
 }
 
+let _dbPromise: Promise<IDBDatabase> | null = null;
+
 function openDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
+  if (_dbPromise) return _dbPromise;
+  _dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
@@ -28,8 +31,13 @@ function openDB(): Promise<IDBDatabase> {
       }
     };
     req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    req.onerror = () => {
+      _dbPromise = null;
+      reject(req.error);
+    };
   });
+  _dbPromise.catch(() => { _dbPromise = null; });
+  return _dbPromise;
 }
 
 function tx(

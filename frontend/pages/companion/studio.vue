@@ -25,6 +25,12 @@
       </div>
     </div>
 
+    <!-- Error banner -->
+    <div v-if="studioError" class="mb-4 flex items-center justify-between rounded-lg border border-destructive bg-destructive/10 px-4 py-3">
+      <p class="text-sm text-destructive">{{ studioError }}</p>
+      <Button variant="ghost" size="sm" class="h-6 text-destructive" @click="studioError = null">&times;</Button>
+    </div>
+
     <!-- Step: Capture -->
     <div v-if="store.currentStep === 'capture'" class="space-y-4">
       <CapturePanel />
@@ -207,8 +213,10 @@
   import { Button } from "@/components/ui/button";
   import { Switch } from "@/components/ui/switch";
   import { useStudioStore } from "@/stores/studio";
+  import type { StudioItem } from "@/stores/studio";
   import { dataUrlToFile, extractCrop } from "@/lib/studio/image-processing";
   import type { Bounds } from "@/lib/studio/canvas-math";
+  import type { DetectedItem } from "@/composables/use-companion";
   import CapturePanel from "@/components/Studio/CapturePanel.vue";
   import DetectionCanvas from "@/components/Studio/DetectionCanvas.vue";
   import ItemGrid from "@/components/Studio/ItemGrid.vue";
@@ -229,6 +237,30 @@
   const activeFrameIndex = ref(0);
   const isReanalyzing = ref(false);
   const reviewViewMode = ref<"grid" | "table">("grid");
+  const studioError = ref<string | null>(null);
+
+  /** Map a DetectedItem from the HBC API to a partial StudioItem. */
+  function mapDetectedItem(item: DetectedItem): Partial<StudioItem> {
+    return {
+      name: item.name,
+      quantity: item.quantity,
+      description: item.description || "",
+      tagIds: item.tag_ids || [],
+      manufacturer: item.manufacturer || "",
+      modelNumber: item.model_number || "",
+      serialNumber: item.serial_number || "",
+      purchasePrice: item.purchase_price,
+      purchaseFrom: item.purchase_from || "",
+      notes: item.notes || "",
+      customFields: item.custom_fields || {},
+      duplicateMatch: item.duplicate_match ? {
+        itemId: item.duplicate_match.item_id,
+        itemName: item.duplicate_match.item_name,
+        serialNumber: item.duplicate_match.serial_number,
+        locationName: item.duplicate_match.location_name,
+      } : null,
+    };
+  }
 
   // Items for the currently displayed frame in the detection canvas
   const itemsForActiveFrame = computed(() => {
@@ -259,31 +291,13 @@
           extraInstructions: extraInstructions.value || undefined,
         });
 
-        const items = result.items.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          description: item.description || "",
-          tagIds: item.tag_ids || [],
-          manufacturer: item.manufacturer || "",
-          modelNumber: item.model_number || "",
-          serialNumber: item.serial_number || "",
-          purchasePrice: item.purchase_price,
-          purchaseFrom: item.purchase_from || "",
-          notes: item.notes || "",
-          customFields: item.custom_fields || {},
-          duplicateMatch: item.duplicate_match ? {
-            itemId: item.duplicate_match.item_id,
-            itemName: item.duplicate_match.item_name,
-            serialNumber: item.duplicate_match.serial_number,
-            locationName: item.duplicate_match.location_name,
-          } : null,
-        }));
-
+        const items = result.items.map(mapDetectedItem);
         store.addDetectedItems(frame.id, items);
       }
       store.goToStep("detection");
     } catch (e: any) {
       console.error("Analysis failed:", e);
+      studioError.value = e?.message || "Analysis failed";
     } finally {
       store.isAnalyzing = false;
     }
@@ -306,30 +320,15 @@
 
       if (result.items.length > 0) {
         const items = result.items.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          description: item.description || "",
-          tagIds: item.tag_ids || [],
-          manufacturer: item.manufacturer || "",
-          modelNumber: item.model_number || "",
-          serialNumber: item.serial_number || "",
-          purchasePrice: item.purchase_price,
-          purchaseFrom: item.purchase_from || "",
-          notes: item.notes || "",
-          customFields: item.custom_fields || {},
-          duplicateMatch: item.duplicate_match ? {
-            itemId: item.duplicate_match.item_id,
-            itemName: item.duplicate_match.item_name,
-            serialNumber: item.duplicate_match.serial_number,
-            locationName: item.duplicate_match.location_name,
-          } : null,
+          ...mapDetectedItem(item),
           cropBounds: bounds,
           croppedImageData: cropped,
         }));
         store.addDetectedItems(frame.id, items);
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Region analysis failed:", e);
+      studioError.value = e?.message || "Region analysis failed";
     } finally {
       isReanalyzing.value = false;
     }
@@ -349,21 +348,14 @@
       const result = await detectItems(file, { singleItem: true });
 
       if (result.items.length > 0) {
-        const detected = result.items[0];
         store.updateItem(itemId, {
-          name: detected.name,
-          quantity: detected.quantity,
-          description: detected.description || "",
-          manufacturer: detected.manufacturer || "",
-          modelNumber: detected.model_number || "",
-          serialNumber: detected.serial_number || "",
-          purchasePrice: detected.purchase_price,
-          notes: detected.notes || "",
+          ...mapDetectedItem(result.items[0]),
           croppedImageData: cropped,
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error("Re-analysis failed:", e);
+      studioError.value = e?.message || "Re-analysis failed";
     } finally {
       isReanalyzing.value = false;
     }

@@ -32,9 +32,24 @@ interface HBCVersion {
   update_available: boolean;
 }
 
-interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
+export interface DetectedItem {
+  name: string;
+  quantity: number;
+  description: string | null;
+  tag_ids: string[] | null;
+  manufacturer: string | null;
+  model_number: string | null;
+  serial_number: string | null;
+  purchase_price: number | null;
+  purchase_from: string | null;
+  notes: string | null;
+  custom_fields: Record<string, string> | null;
+  duplicate_match: {
+    item_id: string;
+    item_name: string;
+    serial_number: string;
+    location_name: string | null;
+  } | null;
 }
 
 export function useCompanion() {
@@ -144,26 +159,6 @@ export function useCompanion() {
   }
 
   // --- Studio API methods ---
-
-  interface DetectedItem {
-    name: string;
-    quantity: number;
-    description: string | null;
-    tag_ids: string[] | null;
-    manufacturer: string | null;
-    model_number: string | null;
-    serial_number: string | null;
-    purchase_price: number | null;
-    purchase_from: string | null;
-    notes: string | null;
-    custom_fields: Record<string, string> | null;
-    duplicate_match: {
-      item_id: string;
-      item_name: string;
-      serial_number: string;
-      location_name: string | null;
-    } | null;
-  }
 
   interface DetectResponse {
     items: DetectedItem[];

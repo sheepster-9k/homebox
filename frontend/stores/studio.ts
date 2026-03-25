@@ -4,13 +4,12 @@
  */
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import type { Bounds } from "@/lib/studio/canvas-math";
 
-export interface CropBounds {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+/**
+ * @deprecated Use `Bounds` from `canvas-math.ts` instead.
+ */
+export type CropBounds = Bounds;
 
 export interface StudioFrame {
   id: string;
@@ -22,7 +21,7 @@ export interface StudioFrame {
 export interface StudioItem {
   id: string;
   frameId: string;
-  cropBounds: CropBounds | null;
+  cropBounds: Bounds | null;
   croppedImageData: string;
   // Fields from HBC DetectedItemResponse
   name: string;

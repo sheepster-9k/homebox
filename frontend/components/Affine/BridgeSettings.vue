@@ -16,7 +16,7 @@
             v-model="url"
             type="text"
             class="w-full rounded border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="http://192.168.42.99:3010"
+            placeholder="http://localhost:3010"
           />
         </div>
         <div>
