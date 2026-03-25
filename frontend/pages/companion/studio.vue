@@ -13,7 +13,8 @@
           <p class="text-sm text-muted-foreground">{{ $t("studio.description") }}</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-3">
+        <SessionManager />
         <Badge variant="outline">
           {{ $t(`studio.steps.${store.currentStep}`) }}
         </Badge>
@@ -201,6 +202,7 @@
   import DetectionCanvas from "@/components/Studio/DetectionCanvas.vue";
   import ItemGrid from "@/components/Studio/ItemGrid.vue";
   import BatchActionBar from "@/components/Studio/BatchActionBar.vue";
+  import SessionManager from "@/components/Studio/SessionManager.vue";
 
   definePageMeta({ middleware: ["auth"] });
 
