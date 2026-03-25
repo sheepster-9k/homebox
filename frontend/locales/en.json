@@ -75,6 +75,10 @@
             "review": "Review",
             "import": "Import"
         },
+        "search": {
+            "placeholder": "Search your inventory with AI (e.g., 'red tools in the garage')...",
+            "no_results": "No matching items found"
+        },
         "canvas": {
             "title": "Detection Canvas",
             "add_region": "Add Region",

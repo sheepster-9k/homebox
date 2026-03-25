@@ -68,6 +68,11 @@
         </NuxtLink>
       </div>
 
+      <!-- Semantic Search (above features grid) -->
+      <div v-if="isAvailable" class="pt-2">
+        <SemanticSearch />
+      </div>
+
       <!-- Affine Integration Settings -->
       <div class="pt-4">
         <BridgeSettings />
@@ -78,6 +83,7 @@
 
 <script setup lang="ts">
   import BridgeSettings from "@/components/Affine/BridgeSettings.vue";
+  import SemanticSearch from "@/components/Studio/SemanticSearch.vue";
   import MdiRobotConfused from "~icons/mdi/robot-confused";
   import MdiCloudOffOutline from "~icons/mdi/cloud-off-outline";
   import MdiChatProcessing from "~icons/mdi/chat-processing";
