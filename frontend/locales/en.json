@@ -48,6 +48,36 @@
         },
         "back": "Back to Companion"
     },
+    "studio": {
+        "title": "AI Studio",
+        "description": "Bulk capture, detect, review, and import items from photos",
+        "new_session": "New Session",
+        "single_item_mode": "Treat each photo as a single item",
+        "instructions_hint": "Optional: describe what's in the photos (e.g., 'tools on a workbench')...",
+        "analyze_all": "Detect Items in All Photos",
+        "analyzing": "Analyzing photos with AI...",
+        "edit_item": "Edit Item Details",
+        "import_complete": "Import Complete!",
+        "items_imported": "items added to your inventory",
+        "scan_more": "Scan More Items",
+        "view_inventory": "View Inventory",
+        "steps": {
+            "capture": "Capture",
+            "detection": "Detection",
+            "review": "Review",
+            "import": "Import"
+        },
+        "fields": {
+            "name": "Name",
+            "quantity": "Quantity",
+            "description": "Description",
+            "manufacturer": "Manufacturer",
+            "model": "Model Number",
+            "serial": "Serial Number",
+            "price": "Purchase Price",
+            "notes": "Notes"
+        }
+    },
     "collection": {
         "copy_invite": "Copy Invite Link",
         "create_invite": "Create Invite",

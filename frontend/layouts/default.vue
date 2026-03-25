@@ -461,6 +461,12 @@
           name: computed(() => t("companion.qr.title")),
           to: "/companion/qr",
         },
+        {
+          id: 84,
+          active: computed(() => route.path === "/companion/studio"),
+          name: computed(() => t("studio.title")),
+          to: "/companion/studio",
+        },
       ],
     },
     {

@@ -191,6 +191,90 @@ export function useCompanion() {
     return `${hbcUrl.value}${path}`;
   }
 
+  // --- Studio API methods ---
+
+  interface DetectedItem {
+    name: string;
+    quantity: number;
+    description: string | null;
+    tag_ids: string[] | null;
+    manufacturer: string | null;
+    model_number: string | null;
+    serial_number: string | null;
+    purchase_price: number | null;
+    purchase_from: string | null;
+    notes: string | null;
+    custom_fields: Record<string, string> | null;
+    duplicate_match: {
+      item_id: string;
+      item_name: string;
+      serial_number: string;
+      location_name: string | null;
+    } | null;
+  }
+
+  interface DetectResponse {
+    items: DetectedItem[];
+    message: string;
+    compressed_images: { data: string; mime_type: string }[];
+  }
+
+  interface BatchCreateItem {
+    name: string;
+    quantity?: number;
+    description?: string;
+    location_id?: string;
+    tag_ids?: string[];
+    serial_number?: string;
+    model_number?: string;
+    manufacturer?: string;
+    purchase_price?: number;
+    purchase_from?: string;
+    notes?: string;
+    custom_fields?: Record<string, string>;
+  }
+
+  interface BatchCreateResponse {
+    created: unknown[];
+    errors: string[];
+    message: string;
+  }
+
+  /** Detect items in an image via HBC vision API. */
+  async function detectItems(
+    image: File,
+    options?: { singleItem?: boolean; extraInstructions?: string },
+  ): Promise<DetectResponse> {
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("single_item", String(options?.singleItem ?? false));
+    if (options?.extraInstructions) {
+      formData.append("extra_instructions", options.extraInstructions);
+    }
+
+    const resp = await fetch(`${hbcUrl.value}/api/tools/vision/detect`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: formData,
+    });
+    if (!resp.ok) throw new Error(`Detection failed: ${resp.status}`);
+    return resp.json();
+  }
+
+  /** Batch create items in Homebox via HBC. */
+  async function batchCreateItems(
+    items: BatchCreateItem[],
+    fallbackLocationId?: string,
+  ): Promise<BatchCreateResponse> {
+    return hbcFetch<BatchCreateResponse>("/api/items", {
+      method: "POST",
+      body: JSON.stringify({
+        items,
+        location_id: fallbackLocationId,
+      }),
+    });
+  }
+
   return {
     hbcUrl,
     isEnabled,
@@ -203,5 +287,7 @@ export function useCompanion() {
     getLocations,
     getPageUrl,
     hbcFetch,
+    detectItems,
+    batchCreateItems,
   };
 }
