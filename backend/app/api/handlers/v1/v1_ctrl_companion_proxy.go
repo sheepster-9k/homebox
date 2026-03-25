@@ -45,10 +45,11 @@ func (ctrl *V1Controller) HandleCompanionProxy(companionURL string) errchain.Han
 			return err
 		}
 
-		// Forward relevant headers
-		proxyReq.Header.Set("Content-Type", r.Header.Get("Content-Type"))
-		if r.Header.Get("Accept") != "" {
-			proxyReq.Header.Set("Accept", r.Header.Get("Accept"))
+		// Forward all relevant headers (auth, content-type, accept)
+		for _, h := range []string{"Content-Type", "Accept", "Authorization"} {
+			if v := r.Header.Get(h); v != "" {
+				proxyReq.Header.Set(h, v)
+			}
 		}
 
 		// Forward content length for multipart uploads
