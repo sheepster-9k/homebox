@@ -93,6 +93,7 @@ type OIDCConf struct {
 	IssuerURL          string        `yaml:"issuer_url"`
 	ClientID           string        `yaml:"client_id"`
 	ClientSecret       string        `yaml:"client_secret"`
+	RedirectURL        string        `yaml:"redirect_url"`
 	Scope              string        `yaml:"scope"                conf:"default:openid profile email"`
 	AllowedGroups      string        `yaml:"allowed_groups"`
 	AutoRedirect       bool          `yaml:"auto_redirect"        conf:"default:false"`

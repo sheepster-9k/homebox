@@ -361,11 +361,15 @@ func (p *OIDCProvider) GetAuthURL(baseURL, state, nonce, pkceVerifier string) st
 }
 
 func (p *OIDCProvider) getOAuth2Config(baseURL string) oauth2.Config {
-	// Construct full redirect URL with dedicated callback endpoint
-	redirectURL, err := url.JoinPath(baseURL, "/api/v1/users/login/oidc/callback")
-	if err != nil {
-		log.Err(err).Msg("failed to construct redirect URL")
-		return oauth2.Config{}
+	redirectURL := strings.TrimSpace(p.config.RedirectURL)
+	if redirectURL == "" {
+		// Construct full redirect URL with dedicated callback endpoint
+		joinedRedirectURL, err := url.JoinPath(baseURL, "/api/v1/users/login/oidc/callback")
+		if err != nil {
+			log.Err(err).Msg("failed to construct redirect URL")
+			return oauth2.Config{}
+		}
+		redirectURL = joinedRedirectURL
 	}
 
 	return oauth2.Config{
