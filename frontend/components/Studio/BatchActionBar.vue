@@ -1,12 +1,12 @@
 <template>
-  <div class="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 px-4 py-3 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  <div
+    class="fixed inset-x-0 bottom-0 z-50 border-t bg-background/95 px-4 py-3 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/60"
+  >
     <div class="mx-auto flex max-w-screen-2xl items-center justify-between gap-4">
       <!-- Left: item count -->
       <div class="text-sm">
         <span class="font-semibold">{{ importableCount }}</span> items ready
-        <span v-if="importedCount > 0" class="ml-2 text-green-600">
-          ({{ importedCount }} imported)
-        </span>
+        <span v-if="importedCount > 0" class="ml-2 text-green-600"> ({{ importedCount }} imported) </span>
       </div>
 
       <!-- Center: location selector -->
@@ -26,19 +26,8 @@
 
       <!-- Right: import button -->
       <div class="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          :disabled="isImporting"
-          @click="$emit('cancel')"
-        >
-          Cancel
-        </Button>
-        <Button
-          size="sm"
-          :disabled="importableCount === 0 || isImporting"
-          @click="$emit('importAll')"
-        >
+        <Button variant="outline" size="sm" :disabled="isImporting" @click="$emit('cancel')"> Cancel </Button>
+        <Button size="sm" :disabled="importableCount === 0 || isImporting" @click="$emit('importAll')">
           <MdiImport v-if="!isImporting" class="mr-2 size-4" />
           <span v-if="isImporting" class="mr-2 animate-spin">&#9696;</span>
           {{ isImporting ? `Importing (${progress}/${importableCount})...` : `Import ${importableCount} Items` }}

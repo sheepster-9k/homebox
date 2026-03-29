@@ -26,7 +26,10 @@
     </div>
 
     <!-- Error banner -->
-    <div v-if="studioError" class="mb-4 flex items-center justify-between rounded-lg border border-destructive bg-destructive/10 px-4 py-3">
+    <div
+      v-if="studioError"
+      class="mb-4 flex items-center justify-between rounded-lg border border-destructive bg-destructive/10 px-4 py-3"
+    >
       <p class="text-sm text-destructive">{{ studioError }}</p>
       <Button variant="ghost" size="sm" class="h-6 text-destructive" @click="studioError = null">&times;</Button>
     </div>
@@ -48,11 +51,7 @@
             class="w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             :placeholder="$t('studio.instructions_hint')"
           />
-          <Button
-            class="w-full"
-            :disabled="store.isAnalyzing || store.frames.length === 0"
-            @click="analyzeAllFrames"
-          >
+          <Button class="w-full" :disabled="store.isAnalyzing || store.frames.length === 0" @click="analyzeAllFrames">
             <MdiMagnifyScan v-if="!store.isAnalyzing" class="mr-2 size-4" />
             <span v-else class="mr-2 animate-spin">&#9696;</span>
             {{ store.isAnalyzing ? $t("studio.analyzing") : $t("studio.analyze_all") }}
@@ -64,8 +63,8 @@
     <!-- Step: Detection (interactive canvas) -->
     <div v-if="store.currentStep === 'detection'" class="space-y-4">
       <DetectionCanvas
-        v-if="store.frames.length > 0"
-        :frame-image-data="store.frames[activeFrameIndex].imageData"
+        v-if="activeFrame"
+        :frame-image-data="activeFrame.imageData"
         :items="itemsForActiveFrame"
         :selected-item-id="store.selectedItemId"
         :is-reanalyzing="isReanalyzing"
@@ -83,7 +82,12 @@
         <span class="text-sm text-muted-foreground">
           Frame {{ activeFrameIndex + 1 }} / {{ store.frames.length }}
         </span>
-        <Button variant="ghost" size="sm" :disabled="activeFrameIndex >= store.frames.length - 1" @click="activeFrameIndex++">
+        <Button
+          variant="ghost"
+          size="sm"
+          :disabled="activeFrameIndex >= store.frames.length - 1"
+          @click="activeFrameIndex++"
+        >
           <MdiChevronRight class="size-4" />
         </Button>
       </div>
@@ -111,6 +115,7 @@
         @select="store.selectedItemId = $event"
         @exclude="store.excludeItem($event)"
         @restore="store.restoreItem($event)"
+        @update="store.updateItem($event.id, $event.updates)"
         @toggle-view="reviewViewMode = 'table'"
       />
 
@@ -124,31 +129,58 @@
           </div>
           <div>
             <label class="text-xs text-muted-foreground">{{ $t("studio.fields.quantity") }}</label>
-            <input v-model.number="store.selectedItem.quantity" type="number" min="1" class="w-full rounded border bg-background px-2 py-1 text-sm" />
+            <input
+              v-model.number="store.selectedItem.quantity"
+              type="number"
+              min="1"
+              class="w-full rounded border bg-background px-2 py-1 text-sm"
+            />
           </div>
           <div class="sm:col-span-2">
             <label class="text-xs text-muted-foreground">{{ $t("studio.fields.description") }}</label>
-            <textarea v-model="store.selectedItem.description" rows="2" class="w-full rounded border bg-background px-2 py-1 text-sm" />
+            <textarea
+              v-model="store.selectedItem.description"
+              rows="2"
+              class="w-full rounded border bg-background px-2 py-1 text-sm"
+            />
           </div>
           <div>
             <label class="text-xs text-muted-foreground">{{ $t("studio.fields.manufacturer") }}</label>
-            <input v-model="store.selectedItem.manufacturer" class="w-full rounded border bg-background px-2 py-1 text-sm" />
+            <input
+              v-model="store.selectedItem.manufacturer"
+              class="w-full rounded border bg-background px-2 py-1 text-sm"
+            />
           </div>
           <div>
             <label class="text-xs text-muted-foreground">{{ $t("studio.fields.model") }}</label>
-            <input v-model="store.selectedItem.modelNumber" class="w-full rounded border bg-background px-2 py-1 text-sm" />
+            <input
+              v-model="store.selectedItem.modelNumber"
+              class="w-full rounded border bg-background px-2 py-1 text-sm"
+            />
           </div>
           <div>
             <label class="text-xs text-muted-foreground">{{ $t("studio.fields.serial") }}</label>
-            <input v-model="store.selectedItem.serialNumber" class="w-full rounded border bg-background px-2 py-1 text-sm" />
+            <input
+              v-model="store.selectedItem.serialNumber"
+              class="w-full rounded border bg-background px-2 py-1 text-sm"
+            />
           </div>
           <div>
             <label class="text-xs text-muted-foreground">{{ $t("studio.fields.price") }}</label>
-            <input v-model.number="store.selectedItem.purchasePrice" type="number" step="0.01" class="w-full rounded border bg-background px-2 py-1 text-sm" />
+            <input
+              v-model.number="store.selectedItem.purchasePrice"
+              type="number"
+              step="0.01"
+              class="w-full rounded border bg-background px-2 py-1 text-sm"
+            />
           </div>
           <div class="sm:col-span-2">
             <label class="text-xs text-muted-foreground">{{ $t("studio.fields.notes") }}</label>
-            <textarea v-model="store.selectedItem.notes" rows="2" class="w-full rounded border bg-background px-2 py-1 text-sm" />
+            <textarea
+              v-model="store.selectedItem.notes"
+              rows="2"
+              class="w-full rounded border bg-background px-2 py-1 text-sm"
+            />
           </div>
         </div>
       </Card>
@@ -159,9 +191,7 @@
       <Card class="p-6 text-center">
         <MdiCheckCircle class="mx-auto mb-3 size-16 text-green-500" />
         <h2 class="text-xl font-bold">{{ $t("studio.import_complete") }}</h2>
-        <p class="mt-1 text-muted-foreground">
-          {{ store.importedCount }} {{ $t("studio.items_imported") }}
-        </p>
+        <p class="mt-1 text-muted-foreground">{{ store.importedCount }} {{ $t("studio.items_imported") }}</p>
         <div class="mt-4 flex justify-center gap-3">
           <Button @click="resetSession">
             <MdiCameraPlus class="mr-2 size-4" />
@@ -200,7 +230,6 @@
 </template>
 
 <script setup lang="ts">
-  import { useI18n } from "vue-i18n";
   import MdiArrowLeft from "~icons/mdi/arrow-left";
   import MdiRefresh from "~icons/mdi/refresh";
   import MdiMagnifyScan from "~icons/mdi/magnify-scan";
@@ -228,8 +257,6 @@
 
   const store = useStudioStore();
   const { detectItems, batchCreateItems, getLocations, isEnabled } = useCompanion();
-  const { t } = useI18n();
-
   const singleItemMode = ref(false);
   const extraInstructions = ref("");
   const locations = ref<{ id: string; name: string }[]>([]);
@@ -238,6 +265,7 @@
   const isReanalyzing = ref(false);
   const reviewViewMode = ref<"grid" | "table">("grid");
   const studioError = ref<string | null>(null);
+  const activeFrame = computed(() => store.frames[activeFrameIndex.value] ?? null);
 
   /** Map a DetectedItem from the HBC API to a partial StudioItem. */
   function mapDetectedItem(item: DetectedItem): Partial<StudioItem> {
@@ -253,12 +281,14 @@
       purchaseFrom: item.purchase_from || "",
       notes: item.notes || "",
       customFields: item.custom_fields || {},
-      duplicateMatch: item.duplicate_match ? {
-        itemId: item.duplicate_match.item_id,
-        itemName: item.duplicate_match.item_name,
-        serialNumber: item.duplicate_match.serial_number,
-        locationName: item.duplicate_match.location_name,
-      } : null,
+      duplicateMatch: item.duplicate_match
+        ? {
+            itemId: item.duplicate_match.item_id,
+            itemName: item.duplicate_match.item_name,
+            serialNumber: item.duplicate_match.serial_number,
+            locationName: item.duplicate_match.location_name,
+          }
+        : null,
     };
   }
 
@@ -274,7 +304,7 @@
     if (!isEnabled.value) return;
     try {
       const locs = await getLocations();
-      locations.value = (locs as { id: string; name: string }[]) || [];
+      locations.value = Array.isArray(locs) ? (locs as { id: string; name: string }[]) : [];
     } catch {
       // Locations will be empty — user can still import without location
     }
@@ -297,7 +327,7 @@
       store.goToStep("detection");
     } catch (e: unknown) {
       console.error("Analysis failed:", e);
-      studioError.value = e?.message || "Analysis failed";
+      studioError.value = e instanceof Error ? e.message : "Analysis failed";
     } finally {
       store.isAnalyzing = false;
     }
@@ -328,7 +358,7 @@
       }
     } catch (e: unknown) {
       console.error("Region analysis failed:", e);
-      studioError.value = e?.message || "Region analysis failed";
+      studioError.value = e instanceof Error ? e.message : "Region analysis failed";
     } finally {
       isReanalyzing.value = false;
     }
@@ -346,16 +376,17 @@
       const cropped = await extractCrop(frame.imageData, item.cropBounds);
       const file = dataUrlToFile(cropped, `reanalyze-${Date.now()}.jpg`);
       const result = await detectItems(file, { singleItem: true });
+      const detectedItem = result.items[0];
 
-      if (result.items.length > 0) {
+      if (detectedItem) {
         store.updateItem(itemId, {
-          ...mapDetectedItem(result.items[0]),
+          ...mapDetectedItem(detectedItem),
           croppedImageData: cropped,
         });
       }
     } catch (e: unknown) {
       console.error("Re-analysis failed:", e);
-      studioError.value = e?.message || "Re-analysis failed";
+      studioError.value = e instanceof Error ? e.message : "Re-analysis failed";
     } finally {
       isReanalyzing.value = false;
     }
@@ -389,7 +420,10 @@
       for (let i = 0; i < items.length; i++) {
         if (result.created[i]) {
           const created = result.created[i] as { id?: string };
-          store.markImported(items[i].id, created.id || "");
+          const importItem = items[i];
+          if (importItem) {
+            store.markImported(importItem.id, created.id || "");
+          }
         }
       }
 
@@ -400,7 +434,7 @@
       store.importProgress = items.length;
       store.goToStep("import");
     } catch (e: unknown) {
-      importErrors.value = [e.message || "Batch import failed"];
+      importErrors.value = [e instanceof Error ? e.message : "Batch import failed"];
     } finally {
       store.isImporting = false;
     }

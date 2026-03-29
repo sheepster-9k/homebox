@@ -34,7 +34,14 @@
             </Button>
           </div>
           <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFile" />
-          <input ref="cameraInput" type="file" accept="image/*" capture="environment" class="hidden" @change="handleFile" />
+          <input
+            ref="cameraInput"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            class="hidden"
+            @change="handleFile"
+          />
         </div>
 
         <!-- Preview + options -->
@@ -83,7 +90,7 @@
               <div class="mt-2 flex flex-wrap gap-1">
                 <Badge v-if="item.location" variant="outline">{{ item.location }}</Badge>
                 <Badge v-if="item.quantity > 1" variant="secondary">x{{ item.quantity }}</Badge>
-                <Badge v-for="tag in (item.tags || [])" :key="tag" variant="secondary">{{ tag }}</Badge>
+                <Badge v-for="tag in item.tags || []" :key="tag" variant="secondary">{{ tag }}</Badge>
               </div>
             </div>
             <Badge :variant="item.duplicate ? 'destructive' : 'default'">
@@ -98,11 +105,17 @@
 </template>
 
 <script setup lang="ts">
+  import BaseContainer from "@/components/Base/Container.vue";
+  import { Badge } from "@/components/ui/badge";
+  import { Button } from "@/components/ui/button";
+  import { Card } from "@/components/ui/card";
+  import { Switch } from "@/components/ui/switch";
   import MdiArrowLeft from "~icons/mdi/arrow-left";
   import MdiCameraPlus from "~icons/mdi/camera-plus";
   import MdiCamera from "~icons/mdi/camera";
   import MdiUpload from "~icons/mdi/upload";
   import MdiMagnifyScan from "~icons/mdi/magnify-scan";
+  import type { DetectedItem } from "@/composables/use-companion";
 
   definePageMeta({ middleware: ["auth"] });
 
@@ -115,8 +128,26 @@
   const singleItem = ref(false);
   const extraInstructions = ref("");
   const analyzing = ref(false);
-  const results = ref<{ items: { name: string; description?: string; location?: string; quantity: number; tags?: string[]; duplicate?: boolean }[] } | null>(null);
+  type CaptureResultItem = {
+    name: string;
+    description: string | null;
+    location?: string;
+    quantity: number;
+    tags?: string[];
+    duplicate?: boolean;
+  };
+  const results = ref<{ items: CaptureResultItem[] } | null>(null);
   const error = ref("");
+
+  function normalizeDetectedItem(item: DetectedItem): CaptureResultItem {
+    return {
+      name: item.name,
+      description: item.description,
+      quantity: item.quantity,
+      tags: item.tag_ids ?? undefined,
+      duplicate: !!item.duplicate_match,
+    };
+  }
 
   function triggerUpload() {
     fileInput.value?.click();
@@ -131,7 +162,9 @@
     if (!file) return;
     imageFile.value = file;
     const reader = new FileReader();
-    reader.onload = () => { imageData.value = reader.result as string; };
+    reader.onload = () => {
+      imageData.value = reader.result as string;
+    };
     reader.readAsDataURL(file);
   }
 
@@ -140,7 +173,9 @@
     if (!file || !file.type.startsWith("image/")) return;
     imageFile.value = file;
     const reader = new FileReader();
-    reader.onload = () => { imageData.value = reader.result as string; };
+    reader.onload = () => {
+      imageData.value = reader.result as string;
+    };
     reader.readAsDataURL(file);
   }
 
@@ -158,10 +193,13 @@
     error.value = "";
 
     try {
-      results.value = await detectItems(imageFile.value, {
+      const detection = await detectItems(imageFile.value, {
         singleItem: singleItem.value,
         extraInstructions: extraInstructions.value || undefined,
       });
+      results.value = {
+        items: detection.items.map(normalizeDetectedItem),
+      };
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : "Analysis failed";
     } finally {

@@ -188,6 +188,7 @@
 
     return data;
   });
+  const availableFields = computed(() => allFields.value ?? []);
 
   watch(includeArchived, (newV, oldV) => {
     if (newV !== oldV) {
@@ -487,7 +488,7 @@
                 <SelectValue :placeholder="$t('items.select_field')" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="field in allFields" :key="field" :value="field"> {{ field }} </SelectItem>
+                <SelectItem v-for="field in availableFields" :key="field" :value="field"> {{ field }} </SelectItem>
               </SelectContent>
             </Select>
           </div>

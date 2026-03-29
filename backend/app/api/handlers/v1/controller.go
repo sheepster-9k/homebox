@@ -98,6 +98,7 @@ type (
 		AllowRegistration bool            `json:"allowRegistration"`
 		LabelPrinting     bool            `json:"labelPrinting"`
 		OIDC              OIDCStatus      `json:"oidc"`
+		Tailscale         TailscaleStatus `json:"tailscale"`
 		Telemetry         TelemetryStatus `json:"telemetry"`
 	}
 
@@ -106,6 +107,11 @@ type (
 		ButtonText   string `json:"buttonText,omitempty"`
 		AutoRedirect bool   `json:"autoRedirect,omitempty"`
 		AllowLocal   bool   `json:"allowLocal"`
+	}
+
+	TailscaleStatus struct {
+		Enabled    bool   `json:"enabled"`
+		ButtonText string `json:"buttonText,omitempty"`
 	}
 
 	TelemetryStatus struct {
@@ -129,6 +135,10 @@ func NewControllerV1(svc *services.AllServices, repos *repo.AllRepos, bus *event
 	ctrl.initOIDCProvider()
 
 	return ctrl
+}
+
+func (ctrl *V1Controller) OIDCEnabled() bool {
+	return ctrl.config.OIDC.Enabled && ctrl.oidcProvider != nil
 }
 
 func (ctrl *V1Controller) initOIDCProvider() {
@@ -162,10 +172,14 @@ func (ctrl *V1Controller) HandleBase(ready ReadyFunc, build Build) errchain.Hand
 			AllowRegistration: ctrl.allowRegistration,
 			LabelPrinting:     ctrl.config.LabelMaker.PrintCommand != nil,
 			OIDC: OIDCStatus{
-				Enabled:      ctrl.config.OIDC.Enabled,
+				Enabled:      ctrl.OIDCEnabled(),
 				ButtonText:   ctrl.config.OIDC.ButtonText,
 				AutoRedirect: ctrl.config.OIDC.AutoRedirect,
 				AllowLocal:   ctrl.config.Options.AllowLocalLogin,
+			},
+			Tailscale: TailscaleStatus{
+				Enabled:    ctrl.TailscaleLoginEnabled(r.Host),
+				ButtonText: ctrl.TailscaleButtonText(),
 			},
 			Telemetry: TelemetryStatus{
 				Enabled: ctrl.config.Otel.Enabled,

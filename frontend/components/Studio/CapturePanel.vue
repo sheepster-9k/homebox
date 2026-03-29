@@ -30,22 +30,14 @@
     <div v-if="store.frames.length > 0" class="space-y-2">
       <p class="text-sm font-medium">{{ store.frames.length }} image(s) loaded</p>
       <div class="flex gap-2 overflow-x-auto">
-        <div
-          v-for="frame in store.frames"
-          :key="frame.id"
-          class="relative shrink-0"
-        >
+        <div v-for="frame in store.frames" :key="frame.id" class="relative shrink-0">
           <img
             :src="frame.imageData"
             :alt="frame.fileName"
             class="h-20 w-28 rounded-lg border object-cover"
             :class="{ 'ring-2 ring-primary': frame.analyzed }"
           />
-          <Badge
-            v-if="frame.analyzed"
-            class="absolute -right-1 -top-1"
-            variant="default"
-          >
+          <Badge v-if="frame.analyzed" class="absolute -right-1 -top-1" variant="default">
             <MdiCheck class="size-3" />
           </Badge>
           <button
@@ -60,7 +52,14 @@
 
     <!-- Hidden inputs -->
     <input ref="fileInput" type="file" accept="image/*" multiple class="hidden" @change="handleFileInput" />
-    <input ref="cameraInput" type="file" accept="image/*" capture="environment" class="hidden" @change="handleFileInput" />
+    <input
+      ref="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      class="hidden"
+      @change="handleFileInput"
+    />
   </div>
 </template>
 

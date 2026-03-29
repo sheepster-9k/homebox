@@ -60,15 +60,21 @@
     }
     return data;
   });
+  const apiStatus = computed(() => status.value);
 
-  whenever(status, status => {
-    if (status?.demo) {
+  watch(apiStatus, currentStatus => {
+    if (currentStatus?.demo) {
       email.value = "demo@example.com";
       loginPassword.value = "demo";
     }
 
     // Auto-redirect to OIDC if autoRedirect is enabled, but not if there's an OIDC initialization error
-    if (status?.oidc?.enabled && status?.oidc?.autoRedirect && !oidcError.value && !shownErrorMessage.value) {
+    if (
+      currentStatus?.oidc?.enabled &&
+      currentStatus.oidc.autoRedirect &&
+      !oidcError.value &&
+      !shownErrorMessage.value
+    ) {
       loginWithOIDC();
     }
   });
@@ -340,8 +346,8 @@
                     {{ $t("index.login") }}
                   </CardTitle>
                 </CardHeader>
-                <CardContent v-if="status?.oidc?.allowLocal !== false" class="flex flex-col gap-2">
-                  <template v-if="status && status.demo">
+                <CardContent v-if="apiStatus?.oidc?.allowLocal !== false" class="flex flex-col gap-2">
+                  <template v-if="apiStatus && apiStatus.demo">
                     <p class="text-center text-xs italic">
                       {{ $t("global.demo_instance") }}
                     </p>
@@ -360,7 +366,7 @@
                 </CardContent>
                 <CardFooter class="flex flex-col gap-2">
                   <Button
-                    v-if="status?.oidc?.allowLocal !== false"
+                    v-if="apiStatus?.oidc?.allowLocal !== false"
                     class="w-full"
                     type="submit"
                     :class="loading ? 'loading' : ''"
@@ -370,7 +376,7 @@
                   </Button>
 
                   <div
-                    v-if="status?.oidc?.enabled && status?.oidc?.allowLocal !== false"
+                    v-if="apiStatus?.oidc?.enabled && apiStatus?.oidc?.allowLocal !== false"
                     class="flex w-full items-center gap-2"
                   >
                     <hr class="flex-1" />
@@ -379,13 +385,13 @@
                   </div>
 
                   <Button
-                    v-if="status?.oidc?.enabled"
+                    v-if="apiStatus?.oidc?.enabled"
                     type="button"
                     variant="outline"
                     class="w-full"
                     @click="loginWithOIDC"
                   >
-                    {{ status.oidc.buttonText || "Sign in with OIDC" }}
+                    {{ apiStatus.oidc.buttonText || "Sign in with OIDC" }}
                   </Button>
                 </CardFooter>
               </Card>
@@ -393,7 +399,7 @@
           </Transition>
           <div class="mt-6 text-center">
             <Button
-              v-if="status && status.allowRegistration && status?.oidc?.allowLocal !== false"
+              v-if="apiStatus && apiStatus.allowRegistration && apiStatus?.oidc?.allowLocal !== false"
               class="group"
               variant="link"
               data-testid="register-button"
@@ -418,10 +424,10 @@
         </div>
       </div>
     </div>
-    <footer v-if="status" class="bottom-0 mt-auto w-full pb-4 text-center">
+    <footer v-if="apiStatus" class="bottom-0 mt-auto w-full pb-4 text-center">
       <p class="text-center text-sm">
-        {{ $t("global.version", { version: status.build.version }) }} ~
-        {{ $t("global.build", { build: status.build.commit }) }}
+        {{ $t("global.version", { version: apiStatus.build.version }) }} ~
+        {{ $t("global.build", { build: apiStatus.build.commit }) }}
       </p>
     </footer>
   </div>

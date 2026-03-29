@@ -24,7 +24,7 @@
           <input
             v-model="workspaceId"
             type="text"
-            class="w-full rounded border bg-background px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full rounded border bg-background px-3 py-1.5 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="workspace-uuid"
           />
         </div>

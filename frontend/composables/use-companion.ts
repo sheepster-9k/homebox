@@ -73,7 +73,7 @@ export function useCompanion() {
    */
   function getAuthHeaders(): Record<string, string> {
     const authCtx = useAuthContext();
-    const token = authCtx.token.value;
+    const token = authCtx.apiToken;
     if (token) {
       return { Authorization: `Bearer ${token}` };
     }
@@ -119,10 +119,7 @@ export function useCompanion() {
   }
 
   /** Send a chat message and get a response. */
-  async function chat(
-    message: string,
-    sessionId?: string,
-  ): Promise<ReadableStream | null> {
+  async function chat(message: string, sessionId?: string): Promise<ReadableStream | null> {
     const url = `${hbcUrl.value}/api/chat/stream`;
     const headers = {
       "Content-Type": "application/json",
@@ -190,7 +187,7 @@ export function useCompanion() {
   /** Detect items in an image via HBC vision API. */
   async function detectItems(
     image: File,
-    options?: { singleItem?: boolean; extraInstructions?: string },
+    options?: { singleItem?: boolean; extraInstructions?: string }
   ): Promise<DetectResponse> {
     const formData = new FormData();
     formData.append("image", image);
@@ -209,10 +206,7 @@ export function useCompanion() {
   }
 
   /** Batch create items in Homebox via HBC. */
-  async function batchCreateItems(
-    items: BatchCreateItem[],
-    fallbackLocationId?: string,
-  ): Promise<BatchCreateResponse> {
+  async function batchCreateItems(items: BatchCreateItem[], fallbackLocationId?: string): Promise<BatchCreateResponse> {
     return hbcFetch<BatchCreateResponse>("/api/items", {
       method: "POST",
       body: JSON.stringify({

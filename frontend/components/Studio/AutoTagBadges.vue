@@ -5,7 +5,7 @@
       :key="tag.id || tag.name"
       :variant="tag.exists ? 'secondary' : 'outline'"
       class="cursor-pointer text-xs transition-opacity"
-      :class="{ 'opacity-50 line-through': tag.excluded }"
+      :class="{ 'line-through opacity-50': tag.excluded }"
       @click="toggleTag(tag)"
     >
       <MdiTagPlus v-if="!tag.exists" class="mr-0.5 size-3 text-green-500" />
@@ -36,9 +36,7 @@
     toggle: [tag: TagInfo];
   }>();
 
-  const newTagCount = computed(() =>
-    props.tags.filter(t => !t.exists && !t.excluded).length
-  );
+  const newTagCount = computed(() => props.tags.filter(t => !t.exists && !t.excluded).length);
 
   function toggleTag(tag: TagInfo) {
     emit("toggle", tag);

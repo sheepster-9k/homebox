@@ -6,7 +6,7 @@
     up the tree
     -->
     <ModalConfirm />
-    <OutdatedModal v-if="status" :status="status" />
+    <OutdatedModal v-if="apiStatus" :status="apiStatus" />
     <ItemCreateModal />
     <WipeInventoryDialog />
     <TagCreateModal />
@@ -17,7 +17,7 @@
     <CollectionCreateModal />
     <CollectionJoinModal />
     <CollectionInviteCreateModal />
-    <SidebarProvider :default-open="sidebarState">
+    <SidebarProvider :default-open="defaultSidebarOpen">
       <Sidebar collapsible="icon">
         <SidebarHeader class="items-center">
           <SidebarGroupLabel class="text-base group-data-[collapsible=icon]:hidden">{{
@@ -200,14 +200,14 @@
           <slot />
           <div class="grow" />
 
-          <footer v-if="status" class="bottom-0 w-full pb-4 text-center">
+          <footer v-if="apiStatus" class="bottom-0 w-full pb-4 text-center">
             <p class="text-center text-sm">
               <span
                 v-html="
                   DOMPurify.sanitize(
                     $t('global.footer.version_link', {
-                      version: status.build.version.replace(/^v/, ''),
-                      build: status.build.commit,
+                      version: apiStatus.build.version.replace(/^v/, ''),
+                      build: apiStatus.build.commit,
                     })
                   )
                 "
@@ -303,6 +303,7 @@
     readonly: true,
     decode: value => value !== "false",
   });
+  const defaultSidebarOpen = sidebarState.value !== false;
 
   const pubApi = usePublicApi();
   const { data: status } = useAsyncData(async () => {
@@ -310,6 +311,7 @@
 
     return data;
   });
+  const apiStatus = computed(() => status.value);
 
   const search = ref("");
 

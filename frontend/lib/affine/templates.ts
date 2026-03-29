@@ -29,11 +29,7 @@ interface LocationData {
 
 /** Generate a markdown document for a Homebox item. */
 export function itemToMarkdown(item: ItemData): string {
-  const lines: string[] = [
-    `<!-- homebox:item:${item.id} -->`,
-    `# ${item.name}`,
-    "",
-  ];
+  const lines: string[] = [`<!-- homebox:item:${item.id} -->`, `# ${item.name}`, ""];
 
   // Details table
   const details: [string, string][] = [];
@@ -72,11 +68,7 @@ export function itemToMarkdown(item: ItemData): string {
 
 /** Generate a location summary markdown document. */
 export function locationToMarkdown(location: LocationData): string {
-  const lines: string[] = [
-    `<!-- homebox:location:${location.id} -->`,
-    `# ${location.name}`,
-    "",
-  ];
+  const lines: string[] = [`<!-- homebox:location:${location.id} -->`, `# ${location.name}`, ""];
 
   if (location.description) {
     lines.push(location.description, "");
@@ -125,12 +117,7 @@ export function inventoryReportToMarkdown(data: {
   ];
 
   if (data.topLocations.length > 0) {
-    lines.push(
-      "## Locations by Item Count",
-      "",
-      "| Location | Items | Value |",
-      "|----------|-------|-------|",
-    );
+    lines.push("## Locations by Item Count", "", "| Location | Items | Value |", "|----------|-------|-------|");
     for (const loc of data.topLocations) {
       lines.push(`| ${loc.name} | ${loc.count} | $${loc.value.toFixed(2)} |`);
     }

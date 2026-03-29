@@ -83,7 +83,10 @@
 
 <script setup lang="ts">
   import BridgeSettings from "@/components/Affine/BridgeSettings.vue";
+  import BaseContainer from "@/components/Base/Container.vue";
   import SemanticSearch from "@/components/Studio/SemanticSearch.vue";
+  import { Badge } from "@/components/ui/badge";
+  import { Card } from "@/components/ui/card";
   import MdiRobotConfused from "~icons/mdi/robot-confused";
   import MdiCloudOffOutline from "~icons/mdi/cloud-off-outline";
   import MdiChatProcessing from "~icons/mdi/chat-processing";

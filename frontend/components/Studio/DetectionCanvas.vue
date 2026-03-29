@@ -30,13 +30,7 @@
       @pointerdown="onContainerPointerDown"
     >
       <!-- Source image -->
-      <img
-        ref="imageEl"
-        :src="frameImageData"
-        alt="Source frame"
-        class="block w-full"
-        @load="onImageLoad"
-      />
+      <img ref="imageEl" :src="frameImageData" alt="Source frame" class="block w-full" @load="onImageLoad" />
 
       <!-- Crop overlays -->
       <CropOverlay
@@ -119,14 +113,15 @@
     const uncroppedItems = props.items.filter(i => !i.cropBounds);
     if (uncroppedItems.length === 0) return;
 
-    const defaults = generateDefaultCrops(
-      uncroppedItems.length,
-      imageWidth.value,
-      imageHeight.value,
-    );
+    const defaults = generateDefaultCrops(uncroppedItems.length, imageWidth.value, imageHeight.value);
 
     for (let i = 0; i < uncroppedItems.length; i++) {
-      emit("updateItemCrop", uncroppedItems[i].id, defaults[i]);
+      const item = uncroppedItems[i];
+      const bounds = defaults[i];
+      if (!item || !bounds) {
+        continue;
+      }
+      emit("updateItemCrop", item.id, bounds);
     }
   }
 
@@ -140,7 +135,7 @@
           imageWidth.value,
           imageHeight.value,
           displayWidth.value,
-          displayHeight.value,
+          displayHeight.value
         ),
       }))
   );
@@ -151,7 +146,7 @@
       imageWidth.value,
       imageHeight.value,
       displayWidth.value,
-      displayHeight.value,
+      displayHeight.value
     );
     emit("updateItemCrop", itemId, imageBounds);
   }
@@ -186,7 +181,7 @@
           imageWidth.value,
           imageHeight.value,
           displayWidth.value,
-          displayHeight.value,
+          displayHeight.value
         );
         emit("addRegion", imageBounds);
       }

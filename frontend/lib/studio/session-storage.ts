@@ -36,14 +36,13 @@ function openDB(): Promise<IDBDatabase> {
       reject(req.error);
     };
   });
-  _dbPromise.catch(() => { _dbPromise = null; });
+  _dbPromise.catch(() => {
+    _dbPromise = null;
+  });
   return _dbPromise;
 }
 
-function tx(
-  db: IDBDatabase,
-  mode: IDBTransactionMode,
-): IDBObjectStore {
+function tx(db: IDBDatabase, mode: IDBTransactionMode): IDBObjectStore {
   return db.transaction(STORE_NAME, mode).objectStore(STORE_NAME);
 }
 
@@ -53,7 +52,7 @@ export async function saveSession(
   name: string,
   data: unknown,
   itemCount: number,
-  thumbnailData: string,
+  thumbnailData: string
 ): Promise<void> {
   const db = await openDB();
   const entry: StoredSession = {

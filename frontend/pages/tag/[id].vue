@@ -51,6 +51,7 @@
     }
     return data;
   });
+  const currentTag = computed(() => tag.value);
 
   const confirm = useConfirm();
 
@@ -216,6 +217,7 @@
       watch: [tagId],
     }
   );
+  const taggedItems = computed(() => items.value);
 </script>
 
 <template>
@@ -226,7 +228,7 @@
         <DialogTitle> {{ $t("tags.update_tag") }} </DialogTitle>
       </DialogHeader>
 
-      <form v-if="tag" class="flex flex-col gap-2" @submit.prevent="update">
+      <form v-if="currentTag" class="flex flex-col gap-2" @submit.prevent="update">
         <FormTextField
           v-model="updateData.name"
           :autofocus="true"
@@ -248,7 +250,7 @@
           v-model="updateData.color"
           :label="$t('components.tag.create_modal.tag_color')"
           :show-hex="true"
-          :starting-color="tag.color"
+          :starting-color="currentTag.color"
         />
         <IconSelector v-model="updateData.icon" :label="$t('components.tag.create_modal.tag_icon')" />
         <DialogFooter>
@@ -258,41 +260,41 @@
     </DialogContent>
   </Dialog>
 
-  <BaseContainer v-if="tag">
+  <BaseContainer v-if="currentTag">
     <!-- set page title -->
-    <Title>{{ tag.name }}</Title>
+    <Title>{{ currentTag.name }}</Title>
 
     <Card class="p-3">
-      <header :class="{ 'mb-2': tag.description }">
+      <header :class="{ 'mb-2': currentTag.description }">
         <div class="flex flex-wrap items-end gap-2">
           <div
             class="mb-auto flex size-12 items-center justify-center rounded-full"
             :style="
-              tag.color
-                ? { backgroundColor: tag.color, color: getContrastTextColor(tag.color) }
+              currentTag.color
+                ? { backgroundColor: currentTag.color, color: getContrastTextColor(currentTag.color) }
                 : { backgroundColor: 'hsl(var(--secondary))', color: 'hsl(var(--secondary-foreground))' }
             "
           >
             <component :is="tagIcon" class="size-7" />
           </div>
           <div>
-            <div v-if="tag?.parentId" class="flex flex-wrap items-center gap-2">
+            <div v-if="currentTag.parentId" class="flex flex-wrap items-center gap-2">
               <template v-for="parent in getBreadcrumbPath()" :key="parent.id">
                 <TagChip :tag="parent" size="sm" />
                 <span class="text-foreground/40">/</span>
               </template>
-              <TagChip :tag="tag" size="sm" hide-icon />
+              <TagChip :tag="currentTag" size="sm" hide-icon />
             </div>
             <h1 class="flex items-center gap-3 pb-1 text-2xl">
-              {{ tag ? tag.name : "" }}
-              <Badge v-if="items && items.totalPrice" variant="secondary" class="ml-2">
-                <Currency :amount="items.totalPrice" />
+              {{ currentTag.name }}
+              <Badge v-if="taggedItems?.totalPrice" variant="secondary" class="ml-2">
+                <Currency :amount="taggedItems.totalPrice" />
               </Badge>
             </h1>
             <div class="flex flex-wrap gap-1 text-xs">
               <div>
                 {{ $t("global.created") }}
-                <DateTime :date="tag?.createdAt" />
+                <DateTime :date="currentTag.createdAt" />
               </div>
             </div>
           </div>
@@ -309,11 +311,11 @@
           </div>
         </div>
       </header>
-      <Separator v-if="tag && tag.description" />
-      <Markdown v-if="tag && tag.description" class="mt-3 text-base" :source="tag.description" />
+      <Separator v-if="currentTag.description" />
+      <Markdown v-if="currentTag.description" class="mt-3 text-base" :source="currentTag.description" />
     </Card>
-    <section v-if="tag && items">
-      <ItemViewSelectable :items="items.items" @refresh="refreshItemList" />
+    <section v-if="taggedItems">
+      <ItemViewSelectable :items="taggedItems.items" @refresh="refreshItemList" />
     </section>
   </BaseContainer>
 </template>

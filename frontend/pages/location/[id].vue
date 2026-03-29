@@ -65,6 +65,7 @@
 
     return data;
   });
+  const currentLocation = computed(() => location.value);
 
   const confirm = useConfirm();
 
@@ -147,6 +148,7 @@
       watch: [locationId],
     }
   );
+  const locationItems = computed(() => items.value ?? []);
 </script>
 
 <template>
@@ -158,7 +160,7 @@
           <DialogTitle> {{ $t("locations.update_location") }} </DialogTitle>
         </DialogHeader>
 
-        <form v-if="location" class="flex flex-col gap-2" @submit.prevent="update">
+        <form v-if="currentLocation" class="flex flex-col gap-2" @submit.prevent="update">
           <FormTextField
             v-model="updateData.name"
             :autofocus="true"
@@ -171,7 +173,7 @@
             :label="$t('components.location.create_modal.location_description')"
             :max-length="1000"
           />
-          <LocationSelector v-model="parent" :current-location="location" />
+          <LocationSelector v-model="parent" :current-location="currentLocation" />
           <DialogFooter>
             <Button type="submit" :disabled="updating">
               <MdiLoading v-if="updating" class="animate-spin" />
@@ -182,12 +184,12 @@
       </DialogContent>
     </Dialog>
 
-    <BaseContainer v-if="location">
+    <BaseContainer v-if="currentLocation">
       <!-- set page title -->
-      <Title>{{ location.name }}</Title>
+      <Title>{{ currentLocation.name }}</Title>
 
       <Card class="p-3">
-        <header :class="{ 'mb-2': location?.description }">
+        <header :class="{ 'mb-2': currentLocation.description }">
           <div class="flex flex-wrap items-end gap-2">
             <div
               class="mb-auto flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
@@ -195,35 +197,35 @@
               <MdiPackageVariant class="size-7" />
             </div>
             <div>
-              <Breadcrumb v-if="location?.parent">
+              <Breadcrumb v-if="currentLocation.parent">
                 <BreadcrumbList>
                   <BreadcrumbItem>
                     <BreadcrumbLink as-child class="text-foreground/70 hover:underline">
-                      <NuxtLink :to="`/location/${location.parent.id}`">
-                        {{ location.parent.name }}
+                      <NuxtLink :to="`/location/${currentLocation.parent.id}`">
+                        {{ currentLocation.parent.name }}
                       </NuxtLink>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
-                  <BreadcrumbItem> {{ location.name }} </BreadcrumbItem>
+                  <BreadcrumbItem> {{ currentLocation.name }} </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
               <h1 class="flex items-center gap-3 pb-1 text-2xl">
-                {{ location ? location.name : "" }}
+                {{ currentLocation.name }}
 
-                <Badge v-if="location && location.totalPrice" variant="secondary">
-                  <Currency :amount="location.totalPrice" />
+                <Badge v-if="currentLocation.totalPrice" variant="secondary">
+                  <Currency :amount="currentLocation.totalPrice" />
                 </Badge>
               </h1>
               <div class="flex flex-wrap gap-1 text-xs">
                 <div>
                   {{ $t("global.created") }}
-                  <DateTime :date="location?.createdAt" />
+                  <DateTime :date="currentLocation.createdAt" />
                 </div>
               </div>
             </div>
             <div class="ml-auto mt-2 flex flex-wrap items-center justify-between gap-2">
-              <LabelMaker :id="location.id" type="location" />
+              <LabelMaker :id="currentLocation.id" type="location" />
               <Button class="w-9 md:w-auto" @click="openCreateItem">
                 <MdiPlus name="mdi-plus" />
                 <span class="hidden md:inline">
@@ -245,17 +247,17 @@
             </div>
           </div>
         </header>
-        <Separator v-if="location && location.description" />
-        <Markdown v-if="location && location.description" class="mt-3 text-base" :source="location.description" />
+        <Separator v-if="currentLocation.description" />
+        <Markdown v-if="currentLocation.description" class="mt-3 text-base" :source="currentLocation.description" />
       </Card>
-      <section v-if="location && items">
-        <ItemViewSelectable :items="items" @refresh="refreshItemList" />
+      <section v-if="locationItems.length > 0">
+        <ItemViewSelectable :items="locationItems" @refresh="refreshItemList" />
       </section>
 
-      <section v-if="location && location.children.length > 0" class="mt-6">
+      <section v-if="currentLocation.children.length > 0" class="mt-6">
         <BaseSectionHeader class="mb-5"> {{ $t("locations.child_locations") }} </BaseSectionHeader>
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <LocationCard v-for="item in location.children" :key="item.id" :location="item" />
+          <LocationCard v-for="item in currentLocation.children" :key="item.id" :location="item" />
         </div>
       </section>
     </BaseContainer>

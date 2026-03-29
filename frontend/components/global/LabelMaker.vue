@@ -39,6 +39,7 @@
 
     return data;
   });
+  const apiStatus = computed(() => status.value);
 
   const serverPrinting = ref(false);
 
@@ -112,7 +113,12 @@
         <img :src="getLabelUrl(false)" />
         <DialogFooter>
           <ButtonGroup>
-            <Button v-if="status?.labelPrinting || false" type="submit" :disabled="serverPrinting" @click="serverPrint">
+            <Button
+              v-if="apiStatus?.labelPrinting || false"
+              type="submit"
+              :disabled="serverPrinting"
+              @click="serverPrint"
+            >
               <MdiLoading v-if="serverPrinting" class="animate-spin" />
               {{ $t("components.global.label_maker.server_print") }}
             </Button>

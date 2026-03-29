@@ -23,6 +23,7 @@
   import { toast } from "@/components/ui/sonner";
   import { useDialog } from "@/components/ui/dialog-provider";
   import { DialogID } from "../ui/dialog-provider/utils";
+  type MaintenanceListEntry = MaintenanceEntry | MaintenanceEntryWithDetails;
 
   const maintenanceFilterStatus = ref(MaintenanceFilterStatus.MaintenanceFilterStatusScheduled);
 
@@ -51,14 +52,14 @@
       watch: [maintenanceFilterStatus],
     }
   );
+  const maintenanceEntries = computed<MaintenanceListEntry[]>(() => maintenanceDataList.value ?? []);
 
   const stats = computed(() => {
-    console.log(maintenanceDataList);
-    if (!maintenanceDataList.value) return [];
+    if (maintenanceEntries.value.length === 0) return [];
 
-    const count = maintenanceDataList.value ? maintenanceDataList.value.length || 0 : 0;
+    const count = maintenanceEntries.value.length || 0;
     let total = 0;
-    maintenanceDataList.value.forEach(item => {
+    maintenanceEntries.value.forEach(item => {
       total += parseFloat(item.cost);
     });
 
@@ -113,6 +114,10 @@
       toast.error(t("maintenance.toast.failed_to_update"));
     }
     refreshList();
+  }
+
+  function hasItemDetails(entry: MaintenanceListEntry): entry is MaintenanceEntryWithDetails {
+    return "itemID" in entry && "itemName" in entry;
   }
 </script>
 
@@ -175,12 +180,12 @@
     <!-- begin -->
     <MaintenanceEditModal ref="maintenanceEditModal" @changed="refreshList" />
     <div class="container space-y-6">
-      <BaseCard v-for="e in maintenanceDataList" :key="e.id">
+      <BaseCard v-for="e in maintenanceEntries" :key="e.id">
         <BaseSectionHeader class="border-b p-6">
           <span class="mb-2">
-            <span v-if="!props.currentItemId">
-              <NuxtLink class="hover:underline" :to="`/item/${(e as MaintenanceEntryWithDetails).itemID}/maintenance`">
-                {{ (e as MaintenanceEntryWithDetails).itemName }}
+            <span v-if="!props.currentItemId && hasItemDetails(e)">
+              <NuxtLink class="hover:underline" :to="`/item/${e.itemID}/maintenance`">
+                {{ e.itemName }}
               </NuxtLink>
               -
             </span>

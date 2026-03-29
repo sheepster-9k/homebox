@@ -6,12 +6,7 @@
         <MdiContentSave class="mr-1 size-4" />
         Save
       </Button>
-      <Button
-        v-if="sessions.length > 0"
-        variant="outline"
-        size="sm"
-        @click="showList = !showList"
-      >
+      <Button v-if="sessions.length > 0" variant="outline" size="sm" @click="showList = !showList">
         <MdiHistory class="mr-1 size-4" />
         Load ({{ sessions.length }})
       </Button>
@@ -25,25 +20,16 @@
           :key="s.id"
           class="flex items-center gap-3 rounded-lg border p-2 transition-colors hover:bg-accent"
         >
-          <img
-            v-if="s.thumbnailData"
-            :src="s.thumbnailData"
-            class="size-10 rounded object-cover"
-            alt=""
-          />
+          <img v-if="s.thumbnailData" :src="s.thumbnailData" class="size-10 rounded object-cover" alt="" />
           <div v-else class="flex size-10 items-center justify-center rounded bg-muted">
             <MdiCamera class="size-5 text-muted-foreground" />
           </div>
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-medium">{{ s.name }}</p>
-            <p class="text-xs text-muted-foreground">
-              {{ s.itemCount }} items &middot; {{ formatDate(s.updatedAt) }}
-            </p>
+            <p class="text-xs text-muted-foreground">{{ s.itemCount }} items &middot; {{ formatDate(s.updatedAt) }}</p>
           </div>
           <div class="flex gap-1">
-            <Button variant="ghost" size="sm" class="h-7" @click="load(s.id)">
-              Load
-            </Button>
+            <Button variant="ghost" size="sm" class="h-7" @click="load(s.id)"> Load </Button>
             <Button variant="ghost" size="sm" class="h-7 text-destructive" @click="remove(s.id)">
               <MdiDelete class="size-3" />
             </Button>
@@ -64,12 +50,7 @@
   import { Card } from "@/components/ui/card";
   import { Button } from "@/components/ui/button";
   import { useStudioStore } from "@/stores/studio";
-  import {
-    saveSession,
-    loadSession,
-    listSessions,
-    deleteSession,
-  } from "@/lib/studio/session-storage";
+  import { saveSession, loadSession, listSessions, deleteSession } from "@/lib/studio/session-storage";
 
   const store = useStudioStore();
 
@@ -91,7 +72,6 @@
   }
 
   async function save() {
-    const thumbnail = store.frames[0]?.imageData || "";
     await saveSession(
       store.sessionId,
       store.sessionName || `Studio Session`,
@@ -103,15 +83,17 @@
         detectedItems: store.detectedItems,
       },
       store.detectedItems.length,
-      "", // Thumbnail not stored; placeholder icon used in list
+      "" // Thumbnail not stored; placeholder icon used in list
     );
     sessions.value = await listSessions();
     saveMessage.value = "Session saved";
-    setTimeout(() => { saveMessage.value = ""; }, 2000);
+    setTimeout(() => {
+      saveMessage.value = "";
+    }, 2000);
   }
 
   async function load(id: string) {
-    const data = await loadSession(id) as {
+    const data = (await loadSession(id)) as {
       sessionId: string;
       sessionName: string;
       currentStep: string;
@@ -121,7 +103,7 @@
     if (!data) return;
 
     store.reset();
-    store.sessionId = data.sessionId;
+    store.sessionId = data.sessionId as typeof store.sessionId;
     store.sessionName = data.sessionName;
     store.currentStep = data.currentStep as "capture" | "detection" | "review" | "import";
     store.frames = data.frames as typeof store.frames;

@@ -71,21 +71,13 @@ export const useStudioStore = defineStore("studio", () => {
   const selectedItemId = ref<string | null>(null);
 
   // Computed
-  const activeItems = computed(() =>
-    detectedItems.value.filter(i => !i.excluded)
-  );
+  const activeItems = computed(() => detectedItems.value.filter(i => !i.excluded));
 
-  const importableItems = computed(() =>
-    activeItems.value.filter(i => !i.imported)
-  );
+  const importableItems = computed(() => activeItems.value.filter(i => !i.imported));
 
-  const importedCount = computed(() =>
-    detectedItems.value.filter(i => i.imported).length
-  );
+  const importedCount = computed(() => detectedItems.value.filter(i => i.imported).length);
 
-  const selectedItem = computed(() =>
-    detectedItems.value.find(i => i.id === selectedItemId.value) || null
-  );
+  const selectedItem = computed(() => detectedItems.value.find(i => i.id === selectedItemId.value) || null);
 
   // Actions
   function addFrame(imageData: string, fileName: string): string {
@@ -180,13 +172,31 @@ export const useStudioStore = defineStore("studio", () => {
   }
 
   return {
-    sessionId, sessionName, currentStep,
-    frames, detectedItems, importResults,
-    isAnalyzing, isImporting, importProgress, selectedItemId,
+    sessionId,
+    sessionName,
+    currentStep,
+    frames,
+    detectedItems,
+    importResults,
+    isAnalyzing,
+    isImporting,
+    importProgress,
+    selectedItemId,
     // Computed
-    activeItems, importableItems, importedCount, selectedItem,
+    activeItems,
+    importableItems,
+    importedCount,
+    selectedItem,
     // Actions
-    addFrame, removeFrame, addDetectedItems, updateItem, excludeItem, restoreItem,
-    markImported, setLocationForAll, goToStep, reset,
+    addFrame,
+    removeFrame,
+    addDetectedItems,
+    updateItem,
+    excludeItem,
+    restoreItem,
+    markImported,
+    setLocationForAll,
+    goToStep,
+    reset,
   };
 });

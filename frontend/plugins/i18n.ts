@@ -30,7 +30,8 @@ export default defineNuxtPlugin(({ vueApp }) => {
     messageCompiler,
     messages: messages(),
   });
-  vueApp.use(i18n);
+  const i18nPlugin = i18n as unknown as Parameters<typeof vueApp.use>[0];
+  vueApp.use(i18nPlugin);
 
   watch(
     () => preferences.value.language,

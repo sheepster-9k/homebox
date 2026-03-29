@@ -111,7 +111,8 @@ type BarcodeAPIConf struct {
 }
 
 type AuthConfig struct {
-	RateLimit AuthRateLimit `yaml:"rate_limit"`
+	RateLimit AuthRateLimit     `yaml:"rate_limit"`
+	Tailscale TailscaleAuthConf `yaml:"tailscale"`
 }
 
 type AuthRateLimit struct {
@@ -120,6 +121,14 @@ type AuthRateLimit struct {
 	MaxAttempts int           `yaml:"max_attempts" conf:"default:5"`
 	BaseBackoff time.Duration `yaml:"base_backoff" conf:"default:10s"`
 	MaxBackoff  time.Duration `yaml:"max_backoff"  conf:"default:5m"`
+}
+
+type TailscaleAuthConf struct {
+	Enabled     bool   `yaml:"enabled"      conf:"default:false"`
+	Issuer      string `yaml:"issuer"       conf:"default:tailscale"`
+	LoginHeader string `yaml:"login_header" conf:"default:Tailscale-User-Login"`
+	NameHeader  string `yaml:"name_header"  conf:"default:Tailscale-User-Name"`
+	ButtonText  string `yaml:"button_text"  conf:"default:Sign in with Tailscale"`
 }
 
 // New parses the CLI/Config file and returns a Config struct. If the file argument is an empty string, the

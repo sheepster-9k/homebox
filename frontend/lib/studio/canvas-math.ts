@@ -29,7 +29,7 @@ export function imageToDisplay(
   imageWidth: number,
   imageHeight: number,
   displayWidth: number,
-  displayHeight: number,
+  displayHeight: number
 ): Bounds {
   const scaleX = displayWidth / imageWidth;
   const scaleY = displayHeight / imageHeight;
@@ -47,7 +47,7 @@ export function displayToImage(
   imageWidth: number,
   imageHeight: number,
   displayWidth: number,
-  displayHeight: number,
+  displayHeight: number
 ): Bounds {
   const scaleX = imageWidth / displayWidth;
   const scaleY = imageHeight / displayHeight;
@@ -60,11 +60,7 @@ export function displayToImage(
 }
 
 /** Constrain bounds to stay within container dimensions. */
-export function constrainBounds(
-  bounds: Bounds,
-  containerWidth: number,
-  containerHeight: number,
-): Bounds {
+export function constrainBounds(bounds: Bounds, containerWidth: number, containerHeight: number): Bounds {
   const x = clamp(bounds.x, 0, containerWidth - MIN_CROP_SIZE);
   const y = clamp(bounds.y, 0, containerHeight - MIN_CROP_SIZE);
   const width = clamp(bounds.width, MIN_CROP_SIZE, containerWidth - x);
@@ -83,11 +79,7 @@ export function pointInBounds(point: Point, bounds: Bounds): boolean {
 }
 
 /** Generate evenly distributed default crop regions for N items. */
-export function generateDefaultCrops(
-  count: number,
-  containerWidth: number,
-  containerHeight: number,
-): Bounds[] {
+export function generateDefaultCrops(count: number, containerWidth: number, containerHeight: number): Bounds[] {
   if (count === 0) return [];
   if (count === 1) {
     const pad = 20;

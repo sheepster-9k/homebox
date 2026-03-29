@@ -47,6 +47,7 @@
     }
     return data;
   });
+  const currentTemplate = computed(() => template.value);
 
   async function confirmDelete() {
     const { isCanceled } = await confirm.open(t("components.template.confirm_delete"));
@@ -246,18 +247,18 @@
     </DialogContent>
   </Dialog>
 
-  <BaseContainer v-if="template">
-    <Title>{{ template.name }}</Title>
+  <BaseContainer v-if="currentTemplate">
+    <Title>{{ currentTemplate.name }}</Title>
 
     <Card class="p-3">
-      <header :class="{ 'mb-2': template.description }">
+      <header :class="{ 'mb-2': currentTemplate.description }">
         <div class="flex flex-wrap items-end gap-2">
           <div>
-            <h1 class="pb-1 text-2xl">{{ template.name }}</h1>
+            <h1 class="pb-1 text-2xl">{{ currentTemplate.name }}</h1>
             <div class="flex flex-wrap gap-1 text-xs text-muted-foreground">
-              <span>{{ $t("global.created") }} <DateTime :date="template.createdAt" /></span>
+              <span>{{ $t("global.created") }} <DateTime :date="currentTemplate.createdAt" /></span>
               <span>•</span>
-              <span>{{ $t("components.template.detail.updated") }} <DateTime :date="template.updatedAt" /></span>
+              <span>{{ $t("components.template.detail.updated") }} <DateTime :date="currentTemplate.updatedAt" /></span>
             </div>
           </div>
           <div class="ml-auto flex gap-2">
@@ -273,56 +274,59 @@
         </div>
       </header>
 
-      <Separator v-if="template.description" class="my-3" />
-      <Markdown v-if="template.description" :source="template.description" />
+      <Separator v-if="currentTemplate.description" class="my-3" />
+      <Markdown v-if="currentTemplate.description" :source="currentTemplate.description" />
 
       <Separator class="my-3" />
       <div class="grid gap-4 text-sm md:grid-cols-2">
         <div>
           <h3 class="mb-2 font-medium">{{ $t("components.template.detail.default_values") }}</h3>
           <dl class="flex flex-col gap-1">
-            <div v-if="template.defaultName" class="flex justify-between">
+            <div v-if="currentTemplate.defaultName" class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("components.template.form.item_name") }}</dt>
-              <dd>{{ template.defaultName }}</dd>
+              <dd>{{ currentTemplate.defaultName }}</dd>
             </div>
-            <div v-if="template.defaultDescription" class="flex justify-between">
+            <div v-if="currentTemplate.defaultDescription" class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("components.template.form.item_description") }}</dt>
-              <dd class="max-w-[200px] truncate">{{ template.defaultDescription }}</dd>
+              <dd class="max-w-[200px] truncate">{{ currentTemplate.defaultDescription }}</dd>
             </div>
             <div class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("global.quantity") }}</dt>
-              <dd>{{ template.defaultQuantity }}</dd>
+              <dd>{{ currentTemplate.defaultQuantity }}</dd>
             </div>
-            <div v-if="template.defaultModelNumber" class="flex justify-between">
+            <div v-if="currentTemplate.defaultModelNumber" class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("components.template.form.model_number") }}</dt>
-              <dd>{{ template.defaultModelNumber }}</dd>
+              <dd>{{ currentTemplate.defaultModelNumber }}</dd>
             </div>
-            <div v-if="template.defaultManufacturer" class="flex justify-between">
+            <div v-if="currentTemplate.defaultManufacturer" class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("components.template.form.manufacturer") }}</dt>
-              <dd>{{ template.defaultManufacturer }}</dd>
+              <dd>{{ currentTemplate.defaultManufacturer }}</dd>
             </div>
-            <div v-if="template.defaultLocation" class="flex justify-between">
+            <div v-if="currentTemplate.defaultLocation" class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("components.template.form.location") }}</dt>
-              <dd>{{ template.defaultLocation.name }}</dd>
+              <dd>{{ currentTemplate.defaultLocation.name }}</dd>
             </div>
-            <div v-if="template.defaultTags && template.defaultTags.length > 0" class="flex justify-between">
+            <div
+              v-if="currentTemplate.defaultTags && currentTemplate.defaultTags.length > 0"
+              class="flex justify-between"
+            >
               <dt class="text-muted-foreground">{{ $t("global.tags") }}</dt>
-              <dd>{{ template.defaultTags.map(t => t.name).join(", ") }}</dd>
+              <dd>{{ currentTemplate.defaultTags.map(tag => tag.name).join(", ") }}</dd>
             </div>
             <div class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("global.insured") }}</dt>
-              <dd>{{ template.defaultInsured ? $t("global.yes") : $t("global.no") }}</dd>
+              <dd>{{ currentTemplate.defaultInsured ? $t("global.yes") : $t("global.no") }}</dd>
             </div>
             <div class="flex justify-between">
               <dt class="text-muted-foreground">{{ $t("components.template.form.lifetime_warranty") }}</dt>
-              <dd>{{ template.defaultLifetimeWarranty ? $t("global.yes") : $t("global.no") }}</dd>
+              <dd>{{ currentTemplate.defaultLifetimeWarranty ? $t("global.yes") : $t("global.no") }}</dd>
             </div>
           </dl>
         </div>
-        <div v-if="template.fields.length > 0">
+        <div v-if="currentTemplate.fields.length > 0">
           <h3 class="mb-2 font-medium">{{ $t("components.template.form.custom_fields") }}</h3>
           <dl class="flex flex-col gap-1">
-            <div v-for="field in template.fields" :key="field.id" class="flex justify-between">
+            <div v-for="field in currentTemplate.fields" :key="field.id" class="flex justify-between">
               <dt class="text-muted-foreground">{{ field.name }}</dt>
               <dd>{{ field.textValue || "—" }}</dd>
             </div>

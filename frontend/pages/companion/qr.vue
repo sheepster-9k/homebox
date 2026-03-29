@@ -54,7 +54,14 @@
               <MdiPackageVariant class="mr-2 size-4" />
               {{ $t("companion.qr.open_item") }}
             </Button>
-            <Button v-else-if="isUrl" variant="outline" class="flex-1" as="a" :href="resolvedUrl || scannedResult" target="_blank">
+            <Button
+              v-else-if="isUrl"
+              variant="outline"
+              class="flex-1"
+              as="a"
+              :href="resolvedUrl || scannedResult"
+              target="_blank"
+            >
               <MdiOpenInNew class="mr-2 size-4" />
               {{ $t("companion.qr.open_link") }}
             </Button>
@@ -70,6 +77,9 @@
 </template>
 
 <script setup lang="ts">
+  import BaseContainer from "@/components/Base/Container.vue";
+  import { Button } from "@/components/ui/button";
+  import { Card } from "@/components/ui/card";
   import { BrowserMultiFormatReader } from "@zxing/library";
   import MdiArrowLeft from "~icons/mdi/arrow-left";
   import MdiQrcodeScan from "~icons/mdi/qrcode-scan";

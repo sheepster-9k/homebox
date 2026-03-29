@@ -5,6 +5,7 @@ import type { UserClient } from "~~/lib/api/user";
 
 export interface IAuthContext {
   get token(): boolean | null;
+  get apiToken(): string | null;
   get attachmentToken(): string | null;
 
   /**
@@ -38,6 +39,7 @@ class AuthContext implements IAuthContext {
 
   private static readonly cookieTokenKey = "hb.auth.session";
   private static readonly cookieAttachmentTokenKey = "hb.auth.attachment_token";
+  private static readonly sessionStorageTokenKey = "hb.auth.token";
 
   user?: UserOut;
   private _token: CookieRef<string | null>;
@@ -50,6 +52,14 @@ class AuthContext implements IAuthContext {
 
   get attachmentToken() {
     return this._attachmentToken.value;
+  }
+
+  get apiToken() {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    return sessionStorage.getItem(AuthContext.sessionStorageTokenKey);
   }
 
   private constructor(token: string, attachmentToken: string) {
@@ -80,6 +90,9 @@ class AuthContext implements IAuthContext {
     // Delete the cookies
     this._token.value = null;
     this._attachmentToken.value = null;
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(AuthContext.sessionStorageTokenKey);
+    }
     console.log("Session invalidated");
   }
 
@@ -93,6 +106,9 @@ class AuthContext implements IAuthContext {
         expires: expiresAt,
       });
       this._attachmentToken.value = r.data.attachmentToken;
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(AuthContext.sessionStorageTokenKey, r.data.token);
+      }
     }
 
     return r;

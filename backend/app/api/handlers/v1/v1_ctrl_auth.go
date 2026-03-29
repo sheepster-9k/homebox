@@ -3,6 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"mime"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,6 +21,8 @@ const (
 	cookieNameToken    = "hb.auth.token"
 	cookieNameRemember = "hb.auth.remember"
 	cookieNameSession  = "hb.auth.session"
+	tailscaleIssuer    = "tailscale-serve"
+	tailnetHostSuffix  = ".ts.net"
 )
 
 type (
@@ -58,6 +61,31 @@ func GetCookies(r *http.Request) (*CookieContents, error) {
 		ExpiresAt: cookie.Expires,
 		Remember:  rememberCookie.Value == "true",
 	}, nil
+}
+
+func (ctrl *V1Controller) TailscaleLoginEnabled(host string) bool {
+	return strings.HasSuffix(strings.ToLower(noPort(host)), tailnetHostSuffix)
+}
+
+func (ctrl *V1Controller) TailscaleButtonText() string {
+	if text := strings.TrimSpace(ctrl.config.Auth.Tailscale.ButtonText); text != "" {
+		return text
+	}
+	return "Sign in with Tailscale"
+}
+
+func (ctrl *V1Controller) tailscaleIssuer() string {
+	if issuer := strings.TrimSpace(ctrl.config.Auth.Tailscale.Issuer); issuer != "" {
+		return issuer
+	}
+	return tailscaleIssuer
+}
+
+func (ctrl *V1Controller) tailscaleHeader(name string, fallback string) string {
+	if value := strings.TrimSpace(name); value != "" {
+		return value
+	}
+	return fallback
 }
 
 // AuthProvider is an interface that can be implemented by any authentication provider.
@@ -133,6 +161,54 @@ func (ctrl *V1Controller) HandleAuthLogin(ps ...AuthProvider) errchain.HandlerFu
 	}
 }
 
+// HandleTailscaleLogin godoc
+//
+//	@Summary	Tailscale Tailnet Login
+//	@Tags		Authentication
+//	@Produce	json
+//	@Success	200	{object}	TokenResponse
+//	@Router		/v1/users/login/tailscale [POST]
+func (ctrl *V1Controller) HandleTailscaleLogin() errchain.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		host := strings.ToLower(noPort(r.Host))
+		if !ctrl.TailscaleLoginEnabled(r.Host) {
+			return validate.NewRequestError(
+				errors.New("tailscale session bootstrap is only available on tailnet routes"),
+				http.StatusForbidden,
+			)
+		}
+
+		loginHeader := ctrl.tailscaleHeader(ctrl.config.Auth.Tailscale.LoginHeader, "Tailscale-User-Login")
+		nameHeader := ctrl.tailscaleHeader(ctrl.config.Auth.Tailscale.NameHeader, "Tailscale-User-Name")
+
+		login := strings.ToLower(strings.TrimSpace(decodeMaybeEncodedHeader(r.Header.Get(loginHeader))))
+		if login == "" {
+			return validate.NewRequestError(
+				errors.New("tailscale identity headers missing"),
+				http.StatusUnauthorized,
+			)
+		}
+
+		displayName := strings.TrimSpace(decodeMaybeEncodedHeader(r.Header.Get(nameHeader)))
+		if displayName == "" {
+			displayName = login
+		}
+
+		newToken, err := ctrl.svc.User.LoginOIDC(r.Context(), ctrl.tailscaleIssuer(), login, login, displayName)
+		if err != nil {
+			log.Warn().Err(err).Str("login", login).Msg("tailscale session bootstrap failed")
+			return validate.NewUnauthorizedError()
+		}
+
+		ctrl.setCookies(w, host, newToken.Raw, newToken.ExpiresAt, true, newToken.AttachmentToken)
+		return server.JSON(w, http.StatusOK, TokenResponse{
+			Token:           "Bearer " + newToken.Raw,
+			ExpiresAt:       newToken.ExpiresAt,
+			AttachmentToken: newToken.AttachmentToken,
+		})
+	}
+}
+
 // HandleAuthLogout godoc
 //
 //	@Summary	User Logout
@@ -185,6 +261,20 @@ func (ctrl *V1Controller) HandleAuthRefresh() errchain.HandlerFunc {
 
 func noPort(host string) string {
 	return strings.Split(host, ":")[0]
+}
+
+func decodeMaybeEncodedHeader(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+
+	decoded, err := new(mime.WordDecoder).DecodeHeader(value)
+	if err != nil {
+		return value
+	}
+
+	return strings.TrimSpace(decoded)
 }
 
 func (ctrl *V1Controller) setCookies(w http.ResponseWriter, domain, token string, expires time.Time, remember bool, attachmentToken string) {
@@ -295,15 +385,12 @@ func (ctrl *V1Controller) unsetCookies(w http.ResponseWriter, domain string) {
 //	@Router		/v1/users/login/oidc [GET]
 func (ctrl *V1Controller) HandleOIDCLogin() errchain.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		// Forbidden if OIDC is not enabled
-		if !ctrl.config.OIDC.Enabled {
+		if !ctrl.OIDCEnabled() {
+			if ctrl.config.OIDC.Enabled && ctrl.oidcProvider == nil {
+				log.Error().Msg("OIDC provider not initialized")
+				return validate.NewRequestError(errors.New("OIDC provider not available"), http.StatusForbidden)
+			}
 			return validate.NewRequestError(fmt.Errorf("OIDC is not enabled"), http.StatusForbidden)
-		}
-
-		// Check if OIDC provider is available
-		if ctrl.oidcProvider == nil {
-			log.Error().Msg("OIDC provider not initialized")
-			return validate.NewRequestError(errors.New("OIDC provider not available"), http.StatusInternalServerError)
 		}
 
 		// Initiate OIDC flow
@@ -322,15 +409,12 @@ func (ctrl *V1Controller) HandleOIDCLogin() errchain.HandlerFunc {
 //	@Router		/v1/users/login/oidc/callback [GET]
 func (ctrl *V1Controller) HandleOIDCCallback() errchain.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		// Forbidden if OIDC is not enabled
-		if !ctrl.config.OIDC.Enabled {
+		if !ctrl.OIDCEnabled() {
+			if ctrl.config.OIDC.Enabled && ctrl.oidcProvider == nil {
+				log.Error().Msg("OIDC provider not initialized")
+				return validate.NewRequestError(errors.New("OIDC provider not available"), http.StatusForbidden)
+			}
 			return validate.NewRequestError(fmt.Errorf("OIDC is not enabled"), http.StatusForbidden)
-		}
-
-		// Check if OIDC provider is available
-		if ctrl.oidcProvider == nil {
-			log.Error().Msg("OIDC provider not initialized")
-			return validate.NewRequestError(errors.New("OIDC provider not available"), http.StatusInternalServerError)
 		}
 
 		// Handle callback

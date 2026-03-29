@@ -17,7 +17,7 @@
   const { t } = useI18n();
 
   useHead({
-    title: computed(() => `HomeBox | ${t("pages.templates.title")}`),
+    title: `HomeBox | ${t("pages.templates.title")}`,
   });
 
   const api = useUserApi();
@@ -31,6 +31,7 @@
     }
     return data;
   });
+  const templateList = computed(() => templates.value ?? []);
 
   // Wrapper functions to match event signatures
   const handleRefresh = () => refresh();
@@ -49,9 +50,9 @@
 
     <TemplateCreateModal @created="handleRefresh" />
 
-    <div v-if="templates && templates.length > 0" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div v-if="templateList.length > 0" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <TemplateCard
-        v-for="tpl in templates"
+        v-for="tpl in templateList"
         :key="tpl.id"
         :template="tpl"
         @deleted="handleRefresh"

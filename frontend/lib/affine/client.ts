@@ -25,7 +25,8 @@ export class AffineClient {
     if (!resp.ok) throw new Error(`Affine API error: ${resp.status}`);
     const result: GraphQLResponse<T> = await resp.json();
     if (result.errors?.length) {
-      throw new Error(`Affine GraphQL error: ${result.errors[0].message}`);
+      const firstError = result.errors[0];
+      throw new Error(`Affine GraphQL error: ${firstError?.message ?? "unknown error"}`);
     }
     return result.data;
   }
@@ -34,25 +35,22 @@ export class AffineClient {
   async getWorkspace(): Promise<AffineWorkspace> {
     const data = await this.graphql<{ workspace: AffineWorkspace }>(
       `query($id: String!) { workspace(id: $id) { id } }`,
-      { id: this.config.workspaceId },
+      { id: this.config.workspaceId }
     );
     return data.workspace;
   }
 
   /** Get list of workspaces. */
   async listWorkspaces(): Promise<AffineWorkspace[]> {
-    const data = await this.graphql<{ workspaces: AffineWorkspace[] }>(
-      `query { workspaces { id } }`,
-    );
+    const data = await this.graphql<{ workspaces: AffineWorkspace[] }>(`query { workspaces { id } }`);
     return data.workspaces;
   }
 
   /** Get document markdown via RPC. */
   async getDocMarkdown(docId: string): Promise<string> {
-    const resp = await fetch(
-      `${this.config.url}/rpc/workspaces/${this.config.workspaceId}/docs/${docId}/markdown`,
-      { headers: this.headers },
-    );
+    const resp = await fetch(`${this.config.url}/rpc/workspaces/${this.config.workspaceId}/docs/${docId}/markdown`, {
+      headers: this.headers,
+    });
     if (!resp.ok) throw new Error(`Failed to get doc markdown: ${resp.status}`);
     return resp.text();
   }
@@ -73,10 +71,7 @@ export class AffineClient {
   async generateAccessToken(name: string): Promise<string> {
     const data = await this.graphql<{
       generateUserAccessToken: { token: string };
-    }>(
-      `mutation($name: String!) { generateUserAccessToken(name: $name) { token } }`,
-      { name },
-    );
+    }>(`mutation($name: String!) { generateUserAccessToken(name: $name) { token } }`, { name });
     return data.generateUserAccessToken.token;
   }
 }

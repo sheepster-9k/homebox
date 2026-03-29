@@ -3,9 +3,7 @@
     <div class="flex items-center justify-between">
       <p class="text-sm font-medium">
         {{ items.length }} item(s) detected
-        <span v-if="excludedCount > 0" class="text-muted-foreground">
-          ({{ excludedCount }} excluded)
-        </span>
+        <span v-if="excludedCount > 0" class="text-muted-foreground"> ({{ excludedCount }} excluded) </span>
       </p>
       <Button v-if="items.length > 0" variant="ghost" size="sm" @click="$emit('toggleView')">
         <MdiTable class="mr-1 size-4" />
@@ -21,6 +19,7 @@
         @select="$emit('select', $event)"
         @exclude="$emit('exclude', $event)"
         @restore="$emit('restore', $event)"
+        @update="$emit('update', $event)"
       />
     </div>
   </div>
@@ -41,10 +40,9 @@
     select: [id: string];
     exclude: [id: string];
     restore: [id: string];
+    update: [payload: { id: string; updates: Partial<StudioItem> }];
     toggleView: [];
   }>();
 
-  const excludedCount = computed(() =>
-    props.items.filter(i => i.excluded).length
-  );
+  const excludedCount = computed(() => props.items.filter(i => i.excluded).length);
 </script>

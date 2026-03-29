@@ -9,36 +9,21 @@
   >
     <!-- Image thumbnail -->
     <div class="relative h-32 bg-muted">
-      <img
-        v-if="item.croppedImageData"
-        :src="item.croppedImageData"
-        :alt="item.name"
-        class="h-full w-full object-cover"
-      />
+      <img v-if="item.croppedImageData" :src="item.croppedImageData" :alt="item.name" class="size-full object-cover" />
       <div v-else class="flex h-full items-center justify-center">
         <MdiPackageVariant class="size-8 text-muted-foreground" />
       </div>
       <!-- Badges -->
-      <Badge
-        v-if="item.duplicateMatch"
-        class="absolute left-2 top-2"
-        variant="destructive"
-      >
-        Duplicate
-      </Badge>
-      <Badge
-        v-if="item.imported"
-        class="absolute right-2 top-2 bg-green-500"
-      >
-        Imported
-      </Badge>
+      <Badge v-if="item.duplicateMatch" class="absolute left-2 top-2" variant="destructive"> Duplicate </Badge>
+      <Badge v-if="item.imported" class="absolute right-2 top-2 bg-green-500"> Imported </Badge>
     </div>
 
     <div class="space-y-2 p-3">
       <!-- Editable name -->
       <input
-        v-model="item.name"
+        :value="item.name"
         class="w-full truncate border-b border-transparent bg-transparent text-sm font-semibold focus:border-primary focus:outline-none"
+        @input="updateName"
         @change="markReviewed"
       />
 
@@ -49,13 +34,11 @@
 
       <!-- Metadata chips -->
       <div class="flex flex-wrap gap-1">
-        <Badge v-if="item.quantity > 1" variant="secondary" class="text-xs">
-          x{{ item.quantity }}
-        </Badge>
+        <Badge v-if="item.quantity > 1" variant="secondary" class="text-xs"> x{{ item.quantity }} </Badge>
         <Badge v-if="item.manufacturer" variant="outline" class="text-xs">
           {{ item.manufacturer }}
         </Badge>
-        <Badge v-if="item.serialNumber" variant="outline" class="text-xs font-mono">
+        <Badge v-if="item.serialNumber" variant="outline" class="font-mono text-xs">
           SN: {{ item.serialNumber.slice(0, 10) }}
         </Badge>
       </div>
@@ -107,13 +90,27 @@
     isSelected: boolean;
   }>();
 
-  defineEmits<{
+  const emit = defineEmits<{
     select: [id: string];
     exclude: [id: string];
     restore: [id: string];
+    update: [payload: { id: string; updates: Partial<StudioItem> }];
   }>();
 
+  function updateName(event: Event) {
+    emit("update", {
+      id: props.item.id,
+      updates: {
+        name: (event.target as HTMLInputElement).value,
+        reviewed: true,
+      },
+    });
+  }
+
   function markReviewed() {
-    props.item.reviewed = true;
+    emit("update", {
+      id: props.item.id,
+      updates: { reviewed: true },
+    });
   }
 </script>

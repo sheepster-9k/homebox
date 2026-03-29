@@ -42,9 +42,7 @@ export function useAffineBridge() {
   loadConfig();
 
   const config = _config;
-  const isConfigured = computed(() =>
-    !!(config.value.url && config.value.workspaceId && config.value.accessToken)
-  );
+  const isConfigured = computed(() => !!(config.value.url && config.value.workspaceId && config.value.accessToken));
   const isAvailable = ref(false);
 
   function getClient(): AffineClient {
@@ -89,7 +87,7 @@ export function useAffineBridge() {
     if (!isConfigured.value) return null;
 
     try {
-      const _markdown = itemToMarkdown(item);
+      void itemToMarkdown(item);
       // For now, log the generated markdown
       // Full doc creation requires CRDT update format which is complex
       // TODO: Implement via Affine's doc creation API when available
@@ -115,7 +113,7 @@ export function useAffineBridge() {
     if (!isConfigured.value) return null;
 
     try {
-      const _markdown = locationToMarkdown(location);
+      void locationToMarkdown(location);
       return `affine-loc-${location.id}`;
     } catch (e) {
       console.error("Failed to create Affine location doc:", e);
@@ -133,7 +131,7 @@ export function useAffineBridge() {
     if (!isConfigured.value) return null;
 
     try {
-      const _markdown = inventoryReportToMarkdown({
+      void inventoryReportToMarkdown({
         ...data,
         generatedAt: new Date().toLocaleString(),
       });

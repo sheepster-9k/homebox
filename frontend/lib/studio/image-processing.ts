@@ -25,11 +25,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 /**
  * Extract a cropped region from an image as a base64 JPEG.
  */
-export async function extractCrop(
-  imageData: string,
-  bounds: CropBounds,
-  quality = 0.85,
-): Promise<string> {
+export async function extractCrop(imageData: string, bounds: CropBounds, quality = 0.85): Promise<string> {
   const img = await loadImage(imageData);
 
   const canvas = document.createElement("canvas");
@@ -39,11 +35,7 @@ export async function extractCrop(
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas 2D context unavailable");
 
-  ctx.drawImage(
-    img,
-    bounds.x, bounds.y, bounds.width, bounds.height,
-    0, 0, bounds.width, bounds.height,
-  );
+  ctx.drawImage(img, bounds.x, bounds.y, bounds.width, bounds.height, 0, 0, bounds.width, bounds.height);
 
   return canvas.toDataURL("image/jpeg", quality);
 }
@@ -53,6 +45,9 @@ export async function extractCrop(
  */
 export function dataUrlToFile(dataUrl: string, fileName: string): File {
   const [header, base64] = dataUrl.split(",");
+  if (!header || !base64) {
+    throw new Error("Invalid data URL");
+  }
   const mime = header.match(/:(.*?);/)?.[1] || "image/jpeg";
   const bytes = atob(base64);
   const arr = new Uint8Array(bytes.length);
@@ -77,9 +72,7 @@ export function fileToDataUrl(file: File): Promise<string> {
 /**
  * Get image dimensions from a data URL.
  */
-export async function getImageDimensions(
-  dataUrl: string,
-): Promise<{ width: number; height: number }> {
+export async function getImageDimensions(dataUrl: string): Promise<{ width: number; height: number }> {
   const img = await loadImage(dataUrl);
   return { width: img.naturalWidth, height: img.naturalHeight };
 }

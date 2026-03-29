@@ -58,7 +58,7 @@
   const route = useRoute();
   const router = useRouter();
   const api = useUserApi();
-  const { isEnabled: companionEnabled, getPageUrl: companionUrl } = useCompanion();
+  const { isEnabled: companionEnabled } = useCompanion();
 
   function openCompanionChat() {
     const name = item.value?.name || "this item";
@@ -88,6 +88,7 @@
     }
     return data;
   });
+  const currentItem = computed(() => item.value);
   onMounted(() => {
     refresh();
   });
@@ -522,6 +523,7 @@
       watch: [itemId],
     }
   );
+  const childItems = computed(() => items.value ?? []);
 
   async function duplicateItem(settings?: DuplicateSettings) {
     if (!item.value) {
@@ -638,9 +640,9 @@
 </script>
 
 <template>
-  <BaseContainer v-if="item">
+  <BaseContainer v-if="currentItem">
     <!-- set page title -->
-    <Title>{{ item.name }}</Title>
+    <Title>{{ currentItem.name }}</Title>
 
     <ItemImageDialog />
     <Dialog :dialog-id="DialogID.DuplicateTemporarySettings">
@@ -664,7 +666,7 @@
 
     <section>
       <Card class="p-3">
-        <header :class="{ 'mb-2': item.description }">
+        <header :class="{ 'mb-2': currentItem.description }">
           <div class="flex flex-wrap items-end gap-2">
             <div
               class="mb-auto flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
@@ -692,7 +694,7 @@
                 </BreadcrumbList>
               </Breadcrumb>
               <h1 class="text-wrap pb-1 text-2xl">
-                {{ item ? item.name : "" }}
+                {{ currentItem.name }}
               </h1>
               <div class="flex flex-wrap gap-2 pb-1">
                 <TagChip v-for="tag in itemTags" :key="tag.id" :tag="tag" size="sm" :ancestors="tag.ancestors" />
@@ -700,22 +702,22 @@
               <div class="flex flex-wrap gap-1 text-wrap text-xs">
                 <div>
                   {{ $t("items.created_at") }}
-                  <DateTime :date="item?.createdAt" />
+                  <DateTime :date="currentItem.createdAt" />
                 </div>
                 -
                 <div>
                   {{ $t("items.updated_at") }}
-                  <DateTime :date="item?.updatedAt" />
+                  <DateTime :date="currentItem.updatedAt" />
                 </div>
               </div>
             </div>
             <div class="ml-auto mt-2 flex flex-wrap items-center justify-between gap-2">
               <LabelMaker
-                v-if="typeof item.assetId === 'string' && item.assetId != ''"
-                :id="item.assetId"
+                v-if="typeof currentItem.assetId === 'string' && currentItem.assetId != ''"
+                :id="currentItem.assetId"
                 type="asset"
               />
-              <LabelMaker v-else :id="item.id" type="item" />
+              <LabelMaker v-else :id="currentItem.id" type="item" />
               <Button class="w-9 md:w-auto" :aria-label="$t('global.create_subitem')" @click="createSubitem">
                 <MdiPlus />
                 <span class="hidden md:inline">{{ $t("global.create_subitem") }}</span>
@@ -751,9 +753,9 @@
             </div>
           </div>
         </header>
-        <Separator v-if="item.description" />
-        <div v-if="item.description" class="prose max-w-full p-1">
-          <Markdown class="text-base" :source="item.description" />
+        <Separator v-if="currentItem.description" />
+        <div v-if="currentItem.description" class="prose max-w-full p-1">
+          <Markdown class="text-base" :source="currentItem.description" />
         </div>
       </Card>
 
@@ -777,7 +779,7 @@
     <section>
       <div class="space-y-6">
         <!-- this renders the other pages content -->
-        <NuxtPage :item="item" :page-key="itemId" />
+        <NuxtPage :item="currentItem" :page-key="itemId" />
 
         <!-- anything in this is not rendered if on another page -->
         <BaseCard v-if="!hasNested" collapsable>
@@ -817,7 +819,7 @@
           <BaseCard v-if="photos && photos.length > 0">
             <template #title> {{ $t("items.photos") }} </template>
             <div class="scroll-bg container mx-auto flex max-h-[500px] flex-wrap gap-2 overflow-y-scroll border-t p-4">
-              <button v-for="(img, i) in photos" :key="i" @click="openImageDialog(img, item.id)">
+              <button v-for="(img, i) in photos" :key="i" @click="openImageDialog(img, currentItem.id)">
                 <picture>
                   <source :srcset="img.originalSrc" :type="img.originalType" />
                   <img class="max-h-[200px] rounded" :src="img.thumbnailSrc" alt="attachment image" />
@@ -833,28 +835,28 @@
                 <ItemAttachmentsList
                   v-if="attachments.manuals.length > 0"
                   :attachments="attachments.manuals"
-                  :item-id="item.id"
+                  :item-id="currentItem.id"
                 />
               </template>
               <template #attachments>
                 <ItemAttachmentsList
                   v-if="attachments.attachments.length > 0"
                   :attachments="attachments.attachments"
-                  :item-id="item.id"
+                  :item-id="currentItem.id"
                 />
               </template>
               <template #warranty>
                 <ItemAttachmentsList
                   v-if="attachments.warranty.length > 0"
                   :attachments="attachments.warranty"
-                  :item-id="item.id"
+                  :item-id="currentItem.id"
                 />
               </template>
               <template #receipts>
                 <ItemAttachmentsList
                   v-if="attachments.receipts.length > 0"
                   :attachments="attachments.receipts"
-                  :item-id="item.id"
+                  :item-id="currentItem.id"
                 />
               </template>
             </DetailsSection>
@@ -881,8 +883,8 @@
       </div>
     </section>
 
-    <section v-if="items && items.length > 0" class="mt-6">
-      <ItemViewSelectable :items="items" @refresh="refreshItemList" />
+    <section v-if="childItems.length > 0" class="mt-6">
+      <ItemViewSelectable :items="childItems" @refresh="refreshItemList" />
     </section>
   </BaseContainer>
 </template>

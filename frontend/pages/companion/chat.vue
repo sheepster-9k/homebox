@@ -22,7 +22,11 @@
             <p class="mt-1 text-sm">{{ $t("companion.chat.examples") }}</p>
           </div>
         </div>
-        <div v-for="(msg, i) in messages" :key="i" :class="['flex', msg.role === 'user' ? 'justify-end' : 'justify-start']">
+        <div
+          v-for="(msg, i) in messages"
+          :key="i"
+          :class="['flex', msg.role === 'user' ? 'justify-end' : 'justify-start']"
+        >
           <div
             :class="[
               'max-w-[80%] rounded-lg px-4 py-2',
@@ -58,13 +62,17 @@
 </template>
 
 <script setup lang="ts">
+  import BaseContainer from "@/components/Base/Container.vue";
+  import Markdown from "@/components/global/Markdown.vue";
+  import { Badge } from "@/components/ui/badge";
+  import { Button } from "@/components/ui/button";
   import MdiArrowLeft from "~icons/mdi/arrow-left";
   import MdiChatProcessing from "~icons/mdi/chat-processing";
   import MdiSend from "~icons/mdi/send";
 
   definePageMeta({ middleware: ["auth"] });
 
-  const { chat, hbcUrl } = useCompanion();
+  const { chat } = useCompanion();
 
   interface Message {
     role: "user" | "assistant";
@@ -124,7 +132,10 @@
               const data = JSON.parse(line.slice(6));
               if (data.type === "content" && data.data) {
                 assistantMsg += data.data;
-                messages.value[msgIdx].content = assistantMsg;
+                const message = messages.value[msgIdx];
+                if (message) {
+                  message.content = assistantMsg;
+                }
                 scrollToBottom();
               } else if (data.type === "session_id") {
                 sessionId.value = data.data;
@@ -133,7 +144,10 @@
               // Non-JSON data line, treat as raw content
               if (line.slice(6).trim()) {
                 assistantMsg += line.slice(6);
-                messages.value[msgIdx].content = assistantMsg;
+                const message = messages.value[msgIdx];
+                if (message) {
+                  message.content = assistantMsg;
+                }
               }
             }
           }

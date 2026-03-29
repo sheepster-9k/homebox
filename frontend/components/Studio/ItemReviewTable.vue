@@ -19,7 +19,7 @@
             <th class="w-8 px-3 py-2">
               <Checkbox :checked="allSelected" @update:checked="toggleAll" />
             </th>
-            <th class="w-12 px-2 py-2" />
+            <th class="w-12 p-2" />
             <th class="px-3 py-2 text-left font-medium">Name</th>
             <th class="w-16 px-3 py-2 text-left font-medium">Qty</th>
             <th class="px-3 py-2 text-left font-medium">Description</th>
@@ -45,7 +45,7 @@
                 @update:checked="toggleItem(item.id)"
               />
             </td>
-            <td class="px-2 py-2">
+            <td class="p-2">
               <img
                 v-if="item.croppedImageData"
                 :src="item.croppedImageData"
@@ -105,13 +105,7 @@
               >
                 <MdiClose class="size-3" />
               </Button>
-              <Button
-                v-else
-                variant="ghost"
-                size="sm"
-                class="h-6 text-xs"
-                @click="$emit('restore', item.id)"
-              >
+              <Button v-else variant="ghost" size="sm" class="h-6 text-xs" @click="$emit('restore', item.id)">
                 Undo
               </Button>
             </td>
