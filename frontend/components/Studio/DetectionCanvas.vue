@@ -126,7 +126,7 @@
     );
 
     for (let i = 0; i < uncroppedItems.length; i++) {
-      emit("updateItemCrop", uncroppedItems[i].id, defaults[i]);
+      emit("updateItemCrop", uncroppedItems[i]!.id, defaults[i]!);
     }
   }
 

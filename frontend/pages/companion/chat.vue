@@ -124,7 +124,7 @@
               const data = JSON.parse(line.slice(6));
               if (data.type === "content" && data.data) {
                 assistantMsg += data.data;
-                messages.value[msgIdx].content = assistantMsg;
+                messages.value[msgIdx]!.content = assistantMsg;
                 scrollToBottom();
               } else if (data.type === "session_id") {
                 sessionId.value = data.data;
@@ -133,7 +133,7 @@
               // Non-JSON data line, treat as raw content
               if (line.slice(6).trim()) {
                 assistantMsg += line.slice(6);
-                messages.value[msgIdx].content = assistantMsg;
+                messages.value[msgIdx]!.content = assistantMsg;
               }
             }
           }

@@ -17,7 +17,7 @@
     <CollectionCreateModal />
     <CollectionJoinModal />
     <CollectionInviteCreateModal />
-    <SidebarProvider :default-open="sidebarState">
+    <SidebarProvider :default-open="(sidebarState as unknown as boolean | undefined) ?? undefined">
       <Sidebar collapsible="icon">
         <SidebarHeader class="items-center">
           <SidebarGroupLabel class="text-base group-data-[collapsible=icon]:hidden">{{
@@ -305,11 +305,12 @@
   });
 
   const pubApi = usePublicApi();
-  const { data: status } = useAsyncData(async () => {
+  const { data: _statusRef } = useAsyncData(async () => {
     const { data } = await pubApi.status();
 
     return data;
   });
+  const status = computed(() => _statusRef.value);
 
   const search = ref("");
 

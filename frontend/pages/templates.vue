@@ -23,7 +23,7 @@
   const api = useUserApi();
   const { openDialog } = useDialog();
 
-  const { data: templates, refresh } = useAsyncData("templates", async () => {
+  const { data: _templatesRef, refresh } = useAsyncData("templates", async () => {
     const { data, error } = await api.templates.getAll();
     if (error) {
       toast.error(t("components.template.toast.load_failed"));
@@ -31,6 +31,7 @@
     }
     return data;
   });
+  const templates = computed(() => _templatesRef.value);
 
   // Wrapper functions to match event signatures
   const handleRefresh = () => refresh();

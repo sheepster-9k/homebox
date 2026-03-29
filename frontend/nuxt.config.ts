@@ -41,6 +41,7 @@ export default defineNuxtConfig({
     },
   },
 
+  // @ts-expect-error nitro config is valid at runtime but not in Nuxt 4 types
   nitro: {
     devProxy: {
       "/api": {

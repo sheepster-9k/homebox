@@ -42,7 +42,7 @@
 
   const tagId = computed<string>(() => route.params.id as string);
 
-  const { data: tag } = useAsyncData(tagId.value, async () => {
+  const { data: _tagRef } = useAsyncData(tagId.value, async () => {
     const { data, error } = await api.tags.get(tagId.value);
     if (error) {
       toast.error(t("tags.toast.failed_load_tag"));
@@ -51,6 +51,8 @@
     }
     return data;
   });
+
+  const tag = computed(() => _tagRef.value);
 
   const confirm = useConfirm();
 
@@ -115,7 +117,7 @@
   });
 
   const tagIcon = computed(() => {
-    return getIconComponent(tag.value?.icon);
+    return getIconComponent(_tagRef.value?.icon);
   });
 
   onMounted(async () => {
@@ -123,12 +125,12 @@
   });
 
   function getBreadcrumbPath() {
-    if (!tag.value || !tag.value.parentId) {
+    if (!_tagRef.value || !_tagRef.value.parentId) {
       return [];
     }
 
     const path: TagOut[] = [];
-    let currentId: string | null = tag.value.parentId;
+    let currentId: string | null = _tagRef.value.parentId;
     const maxDepth = 5;
     let depth = 0;
 
@@ -147,12 +149,12 @@
   }
 
   function openUpdate() {
-    updateData.name = tag.value?.name || "";
-    updateData.description = tag.value?.description || "";
+    updateData.name = _tagRef.value?.name || "";
+    updateData.description = _tagRef.value?.description || "";
     updateData.color = "";
-    updateData.icon = tag.value?.icon || "";
-    if (tag.value?.parent) {
-      const parent = tagStore.tags.find(t => t.id === tag.value?.parentId);
+    updateData.icon = _tagRef.value?.icon || "";
+    if (_tagRef.value?.parent) {
+      const parent = tagStore.tags.find(t => t.id === _tagRef.value?.parentId);
       updateData.parentTag = parent || null;
     } else {
       updateData.parentTag = null;
@@ -182,13 +184,13 @@
     }
 
     toast.success(t("tags.toast.tag_updated"));
-    tag.value = data;
+    _tagRef.value = data;
 
     closeDialog(DialogID.UpdateTag);
     updating.value = false;
   }
 
-  const { data: items, refresh: refreshItemList } = useAsyncData(
+  const { data: _itemsRef, refresh: refreshItemList } = useAsyncData(
     () => tagId.value + "_item_list",
     async () => {
       if (!tagId.value) {
@@ -216,6 +218,8 @@
       watch: [tagId],
     }
   );
+
+  const items = computed(() => _itemsRef.value);
 </script>
 
 <template>

@@ -25,7 +25,7 @@ export class AffineClient {
     if (!resp.ok) throw new Error(`Affine API error: ${resp.status}`);
     const result: GraphQLResponse<T> = await resp.json();
     if (result.errors?.length) {
-      throw new Error(`Affine GraphQL error: ${result.errors[0].message}`);
+      throw new Error(`Affine GraphQL error: ${result.errors[0]!.message}`);
     }
     return result.data;
   }

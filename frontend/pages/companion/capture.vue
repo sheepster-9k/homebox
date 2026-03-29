@@ -161,7 +161,7 @@
       results.value = await detectItems(imageFile.value, {
         singleItem: singleItem.value,
         extraInstructions: extraInstructions.value || undefined,
-      });
+      }) as typeof results.value;
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : "Analysis failed";
     } finally {

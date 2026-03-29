@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-  import { defineProps } from "vue";
   import { Button, buttonVariants } from "@/components/ui/button";
 
   defineProps<{

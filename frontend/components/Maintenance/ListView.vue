@@ -38,7 +38,7 @@
     },
   });
 
-  const { data: maintenanceDataList, refresh: refreshList } = useAsyncData(
+  const { data: _maintenanceDataListRef, refresh: refreshList } = useAsyncData(
     async () => {
       const { data } =
         props.currentItemId !== undefined
@@ -51,6 +51,8 @@
       watch: [maintenanceFilterStatus],
     }
   );
+
+  const maintenanceDataList = computed(() => _maintenanceDataListRef.value);
 
   const stats = computed(() => {
     console.log(maintenanceDataList);

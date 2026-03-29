@@ -121,7 +121,7 @@
     if (!data) return;
 
     store.reset();
-    store.sessionId = data.sessionId;
+    store.sessionId = data.sessionId as `${string}-${string}-${string}-${string}-${string}`;
     store.sessionName = data.sessionName;
     store.currentStep = data.currentStep as "capture" | "detection" | "review" | "import";
     store.frames = data.frames as typeof store.frames;

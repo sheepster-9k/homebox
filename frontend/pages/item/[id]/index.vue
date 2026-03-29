@@ -61,7 +61,7 @@
   const { isEnabled: companionEnabled, getPageUrl: companionUrl } = useCompanion();
 
   function openCompanionChat() {
-    const name = item.value?.name || "this item";
+    const name = _itemRef.value?.name || "this item";
     navigateTo(`/companion/chat?context=Tell me about the item "${name}" in my inventory`);
   }
 
@@ -79,7 +79,7 @@
     return route.fullPath.split("/").at(-1) !== itemId.value;
   });
 
-  const { data: item, refresh } = useAsyncData(itemId.value, async () => {
+  const { data: _itemRef, refresh } = useAsyncData(itemId.value, async () => {
     const { data, error } = await api.items.get(itemId.value);
     if (error) {
       toast.error(t("items.toast.failed_load_item"));
@@ -88,6 +88,7 @@
     }
     return data;
   });
+  const item = computed(() => _itemRef.value);
   onMounted(() => {
     refresh();
   });
@@ -102,18 +103,18 @@
   });
 
   async function adjustQuantity(amount: number) {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return;
     }
 
-    const newQuantity = item.value.quantity + amount;
+    const newQuantity = _itemRef.value.quantity + amount;
     if (newQuantity < 0) {
       toast.error(t("items.toast.quantity_cannot_negative"));
       return;
     }
 
-    const resp = await api.items.patch(item.value.id, {
-      id: item.value.id,
+    const resp = await api.items.patch(_itemRef.value.id, {
+      id: _itemRef.value.id,
       quantity: newQuantity,
     });
 
@@ -123,7 +124,7 @@
     }
 
     if (resp.data) {
-      item.value = resp.data;
+      _itemRef.value = resp.data;
     }
   }
 
@@ -142,23 +143,23 @@
   };
 
   const itemTags = computed(() => {
-    return useTagStore().withAncestors(item.value?.tags || []);
+    return useTagStore().withAncestors(_itemRef.value?.tags || []);
   });
 
   const photos = computed<Photo[]>(() => {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return [];
     }
     return (
-      item.value.attachments.reduce((acc, cur) => {
+      _itemRef.value.attachments.reduce((acc, cur) => {
         if (cur.type === "photo") {
           const photo: Photo = {
-            originalSrc: api.authURL(`/items/${item.value!.id}/attachments/${cur.id}`),
+            originalSrc: api.authURL(`/items/${_itemRef.value!.id}/attachments/${cur.id}`),
             originalType: cur.mimeType,
             attachmentId: cur.id,
           };
           if (cur.thumbnail) {
-            photo.thumbnailSrc = api.authURL(`/items/${item.value!.id}/attachments/${cur.thumbnail.id}`);
+            photo.thumbnailSrc = api.authURL(`/items/${_itemRef.value!.id}/attachments/${cur.thumbnail.id}`);
           } else {
             photo.thumbnailSrc = photo.originalSrc; // fallback to itself if no thumbnail
           }
@@ -170,7 +171,7 @@
   });
 
   const attachments = computed<FilteredAttachments>(() => {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return {
         attachments: [],
         manuals: [],
@@ -179,7 +180,7 @@
       };
     }
 
-    return item.value.attachments.reduce(
+    return _itemRef.value.attachments.reduce(
       (acc, attachment) => {
         if (attachment.type === "photo") {
           return acc;
@@ -205,63 +206,63 @@
   });
 
   const assetID = computed<Details>(() => {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return [];
     }
 
-    if (item.value?.assetId === "000-000") {
+    if (_itemRef.value?.assetId === "000-000") {
       return [];
     }
 
     return [
       {
         name: "items.asset_id",
-        text: item.value?.assetId,
+        text: _itemRef.value?.assetId,
       },
     ];
   });
 
   const itemDetails = computed<Details>(() => {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return [];
     }
 
     const ret: Details = [
       {
         name: "items.quantity",
-        text: item.value?.quantity,
+        text: _itemRef.value?.quantity,
         slot: "quantity",
       },
       {
         name: "items.serial_number",
-        text: item.value?.serialNumber,
+        text: _itemRef.value?.serialNumber,
         copyable: true,
       },
       {
         name: "items.model_number",
-        text: item.value?.modelNumber,
+        text: _itemRef.value?.modelNumber,
         copyable: true,
       },
       {
         name: "items.manufacturer",
-        text: item.value?.manufacturer,
+        text: _itemRef.value?.manufacturer,
         copyable: true,
       },
       {
         name: "items.insured",
-        text: item.value?.insured ? "Yes" : "No",
+        text: _itemRef.value?.insured ? "Yes" : "No",
       },
       {
         name: "items.archived",
-        text: item.value?.archived ? "Yes" : "No",
+        text: _itemRef.value?.archived ? "Yes" : "No",
       },
       {
         name: "items.notes",
         type: "markdown",
-        text: item.value?.notes,
+        text: _itemRef.value?.notes,
       },
       ...assetID.value,
-      ...item.value.fields.map(field => {
+      ..._itemRef.value.fields.map(field => {
         /**
          * Support Special URL Syntax
          */
@@ -336,18 +337,18 @@
     if (preferences.value.showEmpty) {
       return true;
     }
-    return item.value?.lifetimeWarranty || validDate(item.value?.warrantyExpires);
+    return _itemRef.value?.lifetimeWarranty || validDate(_itemRef.value?.warrantyExpires);
   });
 
   const warrantyDetails = computed(() => {
     const details: Details = [
       {
         name: "items.lifetime_warranty",
-        text: item.value?.lifetimeWarranty ? "Yes" : "No",
+        text: _itemRef.value?.lifetimeWarranty ? "Yes" : "No",
       },
     ];
 
-    if (item.value?.lifetimeWarranty) {
+    if (_itemRef.value?.lifetimeWarranty) {
       details.push({
         name: "items.warranty_expires",
         text: "N/A",
@@ -355,7 +356,7 @@
     } else {
       details.push({
         name: "items.warranty_expires",
-        text: item.value?.warrantyExpires || "",
+        text: _itemRef.value?.warrantyExpires || "",
         type: "date",
         date: true,
       });
@@ -364,7 +365,7 @@
     details.push({
       name: "items.warranty_details",
       type: "markdown",
-      text: item.value?.warrantyDetails || "",
+      text: _itemRef.value?.warrantyDetails || "",
     });
 
     if (!preferences.value.showEmpty) {
@@ -378,23 +379,23 @@
     if (preferences.value.showEmpty) {
       return true;
     }
-    return item.value?.purchaseFrom || item.value?.purchasePrice !== 0 || validDate(item.value?.purchaseTime);
+    return _itemRef.value?.purchaseFrom || _itemRef.value?.purchasePrice !== 0 || validDate(_itemRef.value?.purchaseTime);
   });
 
   const purchaseDetails = computed<Details>(() => {
     const v: Details = [
       {
         name: "items.purchased_from",
-        text: item.value?.purchaseFrom || "",
+        text: _itemRef.value?.purchaseFrom || "",
       },
       {
         name: "items.purchase_price",
-        text: String(item.value?.purchasePrice) || "",
+        text: String(_itemRef.value?.purchasePrice) || "",
         type: "currency",
       },
       {
         name: "items.purchase_date",
-        text: item.value?.purchaseTime || "",
+        text: _itemRef.value?.purchaseTime || "",
         type: "date",
         date: true,
       },
@@ -411,23 +412,23 @@
     if (preferences.value.showEmpty) {
       return true;
     }
-    return item.value?.soldTo || item.value?.soldPrice !== 0 || validDate(item.value?.soldTime);
+    return _itemRef.value?.soldTo || _itemRef.value?.soldPrice !== 0 || validDate(_itemRef.value?.soldTime);
   });
 
   const soldDetails = computed<Details>(() => {
     const v: Details = [
       {
         name: "items.sold_to",
-        text: item.value?.soldTo || "",
+        text: _itemRef.value?.soldTo || "",
       },
       {
         name: "items.sold_price",
-        text: String(item.value?.soldPrice) || "",
+        text: String(_itemRef.value?.soldPrice) || "",
         type: "currency",
       },
       {
         name: "items.sold_at",
-        text: item.value?.soldTime || "",
+        text: _itemRef.value?.soldTime || "",
         type: "date",
         date: true,
       },
@@ -452,7 +453,7 @@
       },
       onClose: result => {
         if (result?.action === "delete") {
-          item.value!.attachments = item.value!.attachments.filter(a => a.id !== result.id);
+          _itemRef.value!.attachments = _itemRef.value!.attachments.filter(a => a.id !== result.id);
         }
       },
     });
@@ -487,11 +488,11 @@
   });
 
   const fullpath = computedAsync(async () => {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return [];
     }
 
-    const resp = await api.items.fullpath(item.value.id);
+    const resp = await api.items.fullpath(_itemRef.value.id);
     if (resp.error) {
       toast.error(t("items.toast.failed_load_item"));
       return [];
@@ -500,7 +501,7 @@
     return resp.data;
   });
 
-  const { data: items, refresh: refreshItemList } = useAsyncData(
+  const { data: _itemsRef, refresh: refreshItemList } = useAsyncData(
     () => itemId.value + "_item_list",
     async () => {
       if (!itemId.value) {
@@ -522,9 +523,10 @@
       watch: [itemId],
     }
   );
+  const items = computed(() => _itemsRef.value);
 
   async function duplicateItem(settings?: DuplicateSettings) {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return;
     }
 
@@ -579,7 +581,7 @@
   }
 
   async function saveAsTemplate() {
-    if (!item.value) {
+    if (!_itemRef.value) {
       return;
     }
 
@@ -587,27 +589,27 @@
 
     // Create template from item data
     const templateData = {
-      name: `Template: ${item.value.name}`,
+      name: `Template: ${_itemRef.value.name}`,
       description: "",
       notes: "",
-      defaultName: item.value.name,
-      defaultDescription: item.value.description || "",
-      defaultQuantity: item.value.quantity,
-      defaultInsured: item.value.insured,
-      defaultManufacturer: item.value.manufacturer || "",
-      defaultModelNumber: item.value.modelNumber || "",
-      defaultLifetimeWarranty: item.value.lifetimeWarranty,
-      defaultWarrantyDetails: item.value.warrantyDetails || "",
-      defaultLocationId: item.value.location?.id || "",
-      defaultTagIds: item.value.tags?.map(l => l.id) || [],
+      defaultName: _itemRef.value.name,
+      defaultDescription: _itemRef.value.description || "",
+      defaultQuantity: _itemRef.value.quantity,
+      defaultInsured: _itemRef.value.insured,
+      defaultManufacturer: _itemRef.value.manufacturer || "",
+      defaultModelNumber: _itemRef.value.modelNumber || "",
+      defaultLifetimeWarranty: _itemRef.value.lifetimeWarranty,
+      defaultWarrantyDetails: _itemRef.value.warrantyDetails || "",
+      defaultLocationId: _itemRef.value.location?.id || "",
+      defaultTagIds: _itemRef.value.tags?.map(l => l.id) || [],
       includeWarrantyFields: !!(
-        item.value.warrantyDetails ||
-        item.value.lifetimeWarranty ||
-        item.value.warrantyExpires
+        _itemRef.value.warrantyDetails ||
+        _itemRef.value.lifetimeWarranty ||
+        _itemRef.value.warrantyExpires
       ),
-      includePurchaseFields: !!(item.value.purchaseFrom || item.value.purchasePrice || item.value.purchaseTime),
-      includeSoldFields: !!(item.value.soldTo || item.value.soldPrice || item.value.soldTime),
-      fields: item.value.fields.map(field => ({
+      includePurchaseFields: !!(_itemRef.value.purchaseFrom || _itemRef.value.purchasePrice || _itemRef.value.purchaseTime),
+      includeSoldFields: !!(_itemRef.value.soldTo || _itemRef.value.soldPrice || _itemRef.value.soldTime),
+      fields: _itemRef.value.fields.map(field => ({
         id: NIL_UUID,
         name: field.name,
         type: "text",

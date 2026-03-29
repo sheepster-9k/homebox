@@ -52,6 +52,7 @@ function tag(): TagCreate {
     name: faker.lorem.word(),
     description: faker.lorem.sentence(),
     color: faker.color.rgb(),
+    icon: "",
   };
 }
 

@@ -65,7 +65,7 @@
     <div v-if="store.currentStep === 'detection'" class="space-y-4">
       <DetectionCanvas
         v-if="store.frames.length > 0"
-        :frame-image-data="store.frames[activeFrameIndex].imageData"
+        :frame-image-data="store.frames[activeFrameIndex]!.imageData"
         :items="itemsForActiveFrame"
         :selected-item-id="store.selectedItemId"
         :is-reanalyzing="isReanalyzing"
@@ -297,7 +297,7 @@
       store.goToStep("detection");
     } catch (e: unknown) {
       console.error("Analysis failed:", e);
-      studioError.value = e?.message || "Analysis failed";
+      studioError.value = (e instanceof Error ? e.message : null) || "Analysis failed";
     } finally {
       store.isAnalyzing = false;
     }
@@ -328,7 +328,7 @@
       }
     } catch (e: unknown) {
       console.error("Region analysis failed:", e);
-      studioError.value = e?.message || "Region analysis failed";
+      studioError.value = (e instanceof Error ? e.message : null) || "Region analysis failed";
     } finally {
       isReanalyzing.value = false;
     }
@@ -349,13 +349,13 @@
 
       if (result.items.length > 0) {
         store.updateItem(itemId, {
-          ...mapDetectedItem(result.items[0]),
+          ...mapDetectedItem(result.items[0]!),
           croppedImageData: cropped,
         });
       }
     } catch (e: unknown) {
       console.error("Re-analysis failed:", e);
-      studioError.value = e?.message || "Re-analysis failed";
+      studioError.value = (e instanceof Error ? e.message : null) || "Re-analysis failed";
     } finally {
       isReanalyzing.value = false;
     }
@@ -383,13 +383,13 @@
     }));
 
     try {
-      const result = await batchCreateItems(batchPayload, items[0]?.locationId || undefined);
+      const result = await batchCreateItems(batchPayload, items[0]?.locationId ?? undefined);
 
       // Mark items as imported
       for (let i = 0; i < items.length; i++) {
         if (result.created[i]) {
           const created = result.created[i] as { id?: string };
-          store.markImported(items[i].id, created.id || "");
+          store.markImported(items[i]!.id, created.id || "");
         }
       }
 
@@ -400,7 +400,7 @@
       store.importProgress = items.length;
       store.goToStep("import");
     } catch (e: unknown) {
-      importErrors.value = [e.message || "Batch import failed"];
+      importErrors.value = [(e instanceof Error ? e.message : null) || "Batch import failed"];
     } finally {
       store.isImporting = false;
     }

@@ -47,7 +47,7 @@
 
   const locationId = computed<string>(() => route.params.id as string);
 
-  const { data: location } = useAsyncData(locationId.value, async () => {
+  const { data: _locationRef } = useAsyncData(locationId.value, async () => {
     const { data, error } = await api.locations.get(locationId.value);
     if (error) {
       toast.error(t("locations.toast.failed_load_location"));
@@ -65,6 +65,8 @@
 
     return data;
   });
+  const location = computed(() => _locationRef.value);
+  const items = computed(() => _itemsRef.value);
 
   const confirm = useConfirm();
 
@@ -93,8 +95,8 @@
   });
 
   function openUpdate() {
-    updateData.name = location.value?.name || "";
-    updateData.description = location.value?.description || "";
+    updateData.name = _locationRef.value?.name || "";
+    updateData.description = _locationRef.value?.description || "";
     openDialog(DialogID.UpdateLocation);
   }
 
@@ -114,7 +116,7 @@
     }
 
     toast.success(t("locations.toast.location_updated"));
-    location.value = data;
+    _locationRef.value = data;
     closeDialog(DialogID.UpdateLocation);
     updating.value = false;
   }
@@ -125,7 +127,7 @@
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parent = ref<LocationSummary | any>({});
 
-  const { data: items, refresh: refreshItemList } = useAsyncData(
+  const { data: _itemsRef, refresh: refreshItemList } = useAsyncData(
     () => locationId.value + "_item_list",
     async () => {
       if (!locationId.value) {

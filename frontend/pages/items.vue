@@ -179,7 +179,7 @@
   const fieldTuples = ref<[string, string][]>([]);
   const fieldValuesCache = ref<Record<string, string[]>>({});
 
-  const { data: allFields } = useAsyncData(async () => {
+  const { data: _allFieldsRef } = useAsyncData(async () => {
     const { data, error } = await api.items.fields.getAll();
 
     if (error) {
@@ -188,6 +188,7 @@
 
     return data;
   });
+  const allFields = computed(() => _allFieldsRef.value);
 
   watch(includeArchived, (newV, oldV) => {
     if (newV !== oldV) {

@@ -73,7 +73,7 @@ export function useCompanion() {
    */
   function getAuthHeaders(): Record<string, string> {
     const authCtx = useAuthContext();
-    const token = authCtx.token.value;
+    const token = authCtx.attachmentToken;
     if (token) {
       return { Authorization: `Bearer ${token}` };
     }

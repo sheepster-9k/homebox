@@ -19,6 +19,7 @@
   import FormPassword from "~/components/Form/Password.vue";
   import FormCheckbox from "~/components/Form/Checkbox.vue";
   import PasswordScore from "~/components/global/PasswordScore.vue";
+  import type { APISummary } from "~/lib/api/types/data-contracts";
 
   const { t } = useI18n();
 
@@ -51,7 +52,7 @@
   const oidcError = ref<string | null>(null);
   const shownErrorMessage = ref(false);
 
-  const { data: status } = useAsyncData(async () => {
+  const { data: _statusRef } = useAsyncData(async () => {
     const { data } = await api.status();
 
     if (data.demo) {
@@ -61,7 +62,9 @@
     return data;
   });
 
-  whenever(status, status => {
+  const status = computed(() => _statusRef.value);
+
+  whenever(() => _statusRef.value, (status: APISummary) => {
     if (status?.demo) {
       email.value = "demo@example.com";
       loginPassword.value = "demo";

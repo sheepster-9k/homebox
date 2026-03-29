@@ -16,7 +16,7 @@
 
   const assetId = computed<string>(() => route.params.id as string);
 
-  const { pending, data: items } = useLazyAsyncData(`asset/${assetId.value}`, async () => {
+  const { pending, data: _itemsRef } = useLazyAsyncData(`asset/${assetId.value}`, async () => {
     const { data, error } = await api.assets.get(assetId.value);
     if (error) {
       toast.error(t("items.toast.failed_to_load_asset"));
@@ -35,6 +35,8 @@
         return data.items;
     }
   });
+
+  const items = computed(() => _itemsRef.value);
 </script>
 
 <template>

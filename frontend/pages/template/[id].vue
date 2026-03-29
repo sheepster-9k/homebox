@@ -38,7 +38,7 @@
 
   const { t } = useI18n();
 
-  const { data: template, refresh } = useAsyncData(templateId.value, async () => {
+  const { data: _templateRef, refresh } = useAsyncData(templateId.value, async () => {
     const { data, error } = await api.templates.get(templateId.value);
     if (error) {
       toast.error(t("components.template.toast.load_failed"));
@@ -47,6 +47,8 @@
     }
     return data;
   });
+
+  const template = computed(() => _templateRef.value);
 
   async function confirmDelete() {
     const { isCanceled } = await confirm.open(t("components.template.confirm_delete"));
@@ -84,26 +86,26 @@
   });
 
   function openUpdate() {
-    if (!template.value) return;
+    if (!_templateRef.value) return;
     Object.assign(updateData, {
-      id: template.value.id,
-      name: template.value.name,
-      description: template.value.description,
-      notes: template.value.notes,
-      defaultName: template.value.defaultName ?? "",
-      defaultDescription: template.value.defaultDescription ?? "",
-      defaultQuantity: template.value.defaultQuantity,
-      defaultInsured: template.value.defaultInsured,
-      defaultManufacturer: template.value.defaultManufacturer,
-      defaultModelNumber: template.value.defaultModelNumber ?? "",
-      defaultLifetimeWarranty: template.value.defaultLifetimeWarranty,
-      defaultWarrantyDetails: template.value.defaultWarrantyDetails,
-      defaultLocation: template.value.defaultLocation ?? null,
-      defaultTagIds: template.value.defaultTags?.map(l => l.id) ?? [],
-      includeWarrantyFields: template.value.includeWarrantyFields,
-      includePurchaseFields: template.value.includePurchaseFields,
-      includeSoldFields: template.value.includeSoldFields,
-      fields: template.value.fields.map(f => ({
+      id: _templateRef.value.id,
+      name: _templateRef.value.name,
+      description: _templateRef.value.description,
+      notes: _templateRef.value.notes,
+      defaultName: _templateRef.value.defaultName ?? "",
+      defaultDescription: _templateRef.value.defaultDescription ?? "",
+      defaultQuantity: _templateRef.value.defaultQuantity,
+      defaultInsured: _templateRef.value.defaultInsured,
+      defaultManufacturer: _templateRef.value.defaultManufacturer,
+      defaultModelNumber: _templateRef.value.defaultModelNumber ?? "",
+      defaultLifetimeWarranty: _templateRef.value.defaultLifetimeWarranty,
+      defaultWarrantyDetails: _templateRef.value.defaultWarrantyDetails,
+      defaultLocation: _templateRef.value.defaultLocation ?? null,
+      defaultTagIds: _templateRef.value.defaultTags?.map(l => l.id) ?? [],
+      includeWarrantyFields: _templateRef.value.includeWarrantyFields,
+      includePurchaseFields: _templateRef.value.includePurchaseFields,
+      includeSoldFields: _templateRef.value.includeSoldFields,
+      fields: _templateRef.value.fields.map(f => ({
         id: f.id,
         name: f.name,
         type: "text" as const,
@@ -129,7 +131,7 @@
       return;
     }
     toast.success(t("components.template.toast.updated"));
-    template.value = data;
+    _templateRef.value = data;
     closeDialog(DialogID.UpdateTemplate);
     updating.value = false;
     refresh();
