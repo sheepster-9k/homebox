@@ -154,12 +154,20 @@
       _itemRef.value.attachments.reduce((acc, cur) => {
         if (cur.type === "photo") {
           const photo: Photo = {
+<<<<<<< HEAD
             originalSrc: api.authURL(`/items/${_itemRef.value!.id}/attachments/${cur.id}`),
+=======
+            originalSrc: api.authURL(`/entities/${item.value!.id}/attachments/${cur.id}`),
+>>>>>>> upstream/main
             originalType: cur.mimeType,
             attachmentId: cur.id,
           };
           if (cur.thumbnail) {
+<<<<<<< HEAD
             photo.thumbnailSrc = api.authURL(`/items/${_itemRef.value!.id}/attachments/${cur.thumbnail.id}`);
+=======
+            photo.thumbnailSrc = api.authURL(`/entities/${item.value!.id}/attachments/${cur.thumbnail.id}`);
+>>>>>>> upstream/main
           } else {
             photo.thumbnailSrc = photo.originalSrc; // fallback to itself if no thumbnail
           }
@@ -592,6 +600,7 @@
       name: `Template: ${_itemRef.value.name}`,
       description: "",
       notes: "",
+<<<<<<< HEAD
       defaultName: _itemRef.value.name,
       defaultDescription: _itemRef.value.description || "",
       defaultQuantity: _itemRef.value.quantity,
@@ -602,6 +611,18 @@
       defaultWarrantyDetails: _itemRef.value.warrantyDetails || "",
       defaultLocationId: _itemRef.value.location?.id || "",
       defaultTagIds: _itemRef.value.tags?.map(l => l.id) || [],
+=======
+      defaultName: item.value.name,
+      defaultDescription: item.value.description || "",
+      defaultQuantity: item.value.quantity,
+      defaultInsured: item.value.insured,
+      defaultManufacturer: item.value.manufacturer || "",
+      defaultModelNumber: item.value.modelNumber || "",
+      defaultLifetimeWarranty: item.value.lifetimeWarranty,
+      defaultWarrantyDetails: item.value.warrantyDetails || "",
+      defaultLocationId: item.value.location?.id || item.value.parent?.id || "",
+      defaultTagIds: item.value.tags?.map(l => l.id) || [],
+>>>>>>> upstream/main
       includeWarrantyFields: !!(
         _itemRef.value.warrantyDetails ||
         _itemRef.value.lifetimeWarranty ||
