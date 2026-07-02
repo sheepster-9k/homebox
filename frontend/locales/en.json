@@ -137,6 +137,7 @@
             "members": "Members",
             "notifiers": "Notifiers",
             "settings": "Settings",
+            "entity_types": "Entity Types",
             "tools": "Tools"
         },
         "uses": "Uses"
@@ -530,6 +531,10 @@
         "return_home": "Return Home",
         "save": "Save",
         "search": "Search",
+        "select": "Select...",
+        "show_less": "Show less",
+        "show_more": "Show more",
+        "type": "Type",
         "sign_out": "Sign Out",
         "submit": "Submit",
         "tags": "Tags",

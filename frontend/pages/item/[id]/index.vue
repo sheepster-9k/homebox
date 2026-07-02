@@ -154,12 +154,12 @@
       _itemRef.value.attachments.reduce((acc, cur) => {
         if (cur.type === "photo") {
           const photo: Photo = {
-            originalSrc: api.authURL(`/items/${_itemRef.value!.id}/attachments/${cur.id}`),
+            originalSrc: api.authURL(`/entities/${_itemRef.value!.id}/attachments/${cur.id}`),
             originalType: cur.mimeType,
             attachmentId: cur.id,
           };
           if (cur.thumbnail) {
-            photo.thumbnailSrc = api.authURL(`/items/${_itemRef.value!.id}/attachments/${cur.thumbnail.id}`);
+            photo.thumbnailSrc = api.authURL(`/entities/${_itemRef.value!.id}/attachments/${cur.thumbnail.id}`);
           } else {
             photo.thumbnailSrc = photo.originalSrc; // fallback to itself if no thumbnail
           }
@@ -600,7 +600,7 @@
       defaultModelNumber: _itemRef.value.modelNumber || "",
       defaultLifetimeWarranty: _itemRef.value.lifetimeWarranty,
       defaultWarrantyDetails: _itemRef.value.warrantyDetails || "",
-      defaultLocationId: _itemRef.value.location?.id || "",
+      defaultLocationId: _itemRef.value.parent?.id || "",
       defaultTagIds: _itemRef.value.tags?.map(l => l.id) || [],
       includeWarrantyFields: !!(
         _itemRef.value.warrantyDetails ||
