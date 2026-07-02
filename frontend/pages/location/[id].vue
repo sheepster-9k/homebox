@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { useI18n } from "vue-i18n";
   import { toast } from "@/components/ui/sonner";
-  import type { LocationSummary, LocationUpdate } from "~~/lib/api/types/data-contracts";
+  import type { EntitySummary, EntityUpdate } from "~~/lib/api/types/data-contracts";
   import { useLocationStore } from "~~/stores/locations";
   import MdiLoading from "~icons/mdi/loading";
   import MdiPackageVariant from "~icons/mdi/package-variant";
@@ -55,8 +55,8 @@
       return;
     }
 
-    if (data.parent) {
-      parent.value = locations.value.find(l => l.id === data.parent.id);
+    if (data?.parent) {
+      parent.value = locations.value.find(l => l.id === data.parent!.id);
     }
 
     if (parent.value === undefined) {
@@ -87,11 +87,11 @@
   }
 
   const updating = ref(false);
-  const updateData = reactive<LocationUpdate>({
+  const updateData = reactive({
     id: locationId.value,
     name: "",
     description: "",
-    parentId: null,
+    parentId: null as string | null,
   });
 
   function openUpdate() {
@@ -106,8 +106,22 @@
 
   async function update() {
     updating.value = true;
-    updateData.parentId = parent.value?.id || null;
-    const { error, data } = await api.locations.update(locationId.value, updateData);
+    if (!location.value) {
+      updating.value = false;
+      return;
+    }
+    const payload: EntityUpdate = {
+      ...location.value,
+      name: updateData.name,
+      description: updateData.description,
+      parentId: parent.value?.id || null,
+      entityTypeId: location.value.entityType?.id || "",
+      tagIds: location.value.tags?.map(t => t.id) || [],
+      fields: location.value.fields || [],
+      purchasePrice: location.value.purchasePrice || 0,
+      soldPrice: location.value.soldPrice || 0,
+    };
+    const { error, data } = await api.locations.update(locationId.value, payload);
 
     if (error) {
       updating.value = false;
