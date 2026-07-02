@@ -575,8 +575,8 @@
           parent.value = data;
         }
 
-        if (data.location || data.parent) {
-          const loc = data.location || data.parent;
+        if (data.parent) {
+          const loc = data.parent;
           parentItemLocationId = loc.id;
         }
 
@@ -662,7 +662,7 @@
         quantity: form.quantity,
         description: form.description,
         tagIds: form.tags,
-        entityTypeId: selectedEntityType.value?.id,
+        entityTypeId: selectedEntityType.value?.id || "",
       };
 
       const result = await api.items.create(out);

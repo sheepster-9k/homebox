@@ -111,6 +111,7 @@
     const payload: EntityUpdate = {
       ...item.value,
       parentId: parent.value?.id || item.value.parent?.id || null,
+      entityTypeId: item.value.entityType?.id || "",
       tagIds: item.value.tagIds,
       assetId: item.value.assetId,
       purchasePrice,
@@ -476,6 +477,7 @@
     const payload: EntityUpdate = {
       ...item.value,
       parentId: parent.value?.id || item.value.parent?.id || null,
+      entityTypeId: item.value.entityType?.id || "",
       tagIds: item.value.tagIds,
       assetId: item.value.assetId,
       syncChildEntityLocations: item.value.syncChildEntityLocations,

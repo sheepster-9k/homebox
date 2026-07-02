@@ -159,7 +159,7 @@
         size="sm"
         @click="
           openDialog(DialogID.EditMaintenance, {
-            params: { type: 'create', itemId: props.currentItemId },
+            params: { type: 'create', itemId: props.currentItemId! },
             onClose: result => {
               if (result) {
                 refreshList();
@@ -264,7 +264,7 @@
           class="relative block w-full rounded-lg border-2 border-dashed p-12 text-center"
           @click="
             openDialog(DialogID.EditMaintenance, {
-              params: { type: 'create', itemId: props.currentItemId },
+              params: { type: 'create', itemId: props.currentItemId! },
               onClose: result => {
                 if (result) {
                   refreshList();
