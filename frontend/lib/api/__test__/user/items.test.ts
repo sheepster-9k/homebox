@@ -17,6 +17,9 @@ describe("user should be able to create an item and add an attachment", () => {
       parentId: null,
       name: `__test__.location.name_${increment}`,
       description: `__test__.location.description_${increment}`,
+      entityTypeId: "",
+      quantity: 1,
+      tagIds: [],
     });
     expect(response.status).toBe(201);
     increment++;
@@ -34,12 +37,12 @@ describe("user should be able to create an item and add an attachment", () => {
     const [location, cleanup] = await useLocation(api);
 
     const { response, data: item } = await api.items.create({
-      parentId: null,
       name: "test-item",
       tagIds: [],
       description: "test-description",
       quantity: 2,
       parentId: location.id,
+      entityTypeId: "",
     });
     expect(response.status).toBe(201);
 
@@ -69,12 +72,12 @@ describe("user should be able to create an item and add an attachment", () => {
     const [location, cleanup] = await useLocation(api);
 
     const { response, data: item } = await api.items.create({
-      parentId: null,
       name: faker.vehicle.model(),
       tagIds: [],
       description: faker.lorem.paragraph(1),
       quantity: 2,
       parentId: location.id,
+      entityTypeId: "",
     });
     expect(response.status).toBe(201);
 
@@ -89,6 +92,7 @@ describe("user should be able to create an item and add an attachment", () => {
     const itemUpdate = {
       ...item,
       parentId: item.parent?.id || null,
+      entityTypeId: item.entityType?.id || "",
       tagIds: item.tags.map(l => l.id),
       fields,
     };
@@ -123,12 +127,12 @@ describe("user should be able to create an item and add an attachment", () => {
     const api = await sharedUserClient();
     const [location, cleanup] = await useLocation(api);
     const { response, data: item } = await api.items.create({
-      parentId: null,
       name: faker.vehicle.model(),
       tagIds: [],
       description: faker.lorem.paragraph(1),
       quantity: 2,
       parentId: location.id,
+      entityTypeId: "",
     });
     expect(response.status).toBe(201);
 
@@ -169,6 +173,9 @@ describe("user should be able to create an item and add an attachment", () => {
         parentId: lastLocationId,
         name: locations[i]!,
         description: "",
+        entityTypeId: "",
+        quantity: 1,
+        tagIds: [],
       });
       expect(response.status).toBe(201);
 
@@ -181,6 +188,7 @@ describe("user should be able to create an item and add an attachment", () => {
       description: faker.lorem.paragraph(1),
       quantity: 2,
       parentId: lastLocationId,
+      entityTypeId: "",
     });
     expect(response.status).toBe(201);
 
@@ -206,6 +214,7 @@ describe("user should be able to create an item and add an attachment", () => {
       description: "test-description",
       quantity: 2,
       parentId: parentLocation.id,
+      entityTypeId: "",
     });
     expect(parentResponse.status).toBe(201);
     expect(parent.id).toBeTruthy();
@@ -216,11 +225,13 @@ describe("user should be able to create an item and add an attachment", () => {
       description: "test-description",
       quantity: 2,
       parentId: childsLocation.id,
+      entityTypeId: "",
     });
     expect(child1Response.status).toBe(201);
     const child1ItemUpdate = {
       ...child1Item,
       parentId: parent.id,
+      entityTypeId: child1Item.entityType?.id || "",
       tagIds: [],
     };
     const { response: child1UpdatedResponse } = await api.items.update(child1Item.id, child1ItemUpdate as EntityUpdate);
@@ -232,11 +243,13 @@ describe("user should be able to create an item and add an attachment", () => {
       description: "test-description",
       quantity: 2,
       parentId: childsLocation.id,
+      entityTypeId: "",
     });
     expect(child2Response.status).toBe(201);
     const child2ItemUpdate = {
       ...child2Item,
       parentId: parent.id,
+      entityTypeId: child2Item.entityType?.id || "",
       tagIds: [],
     };
     const { response: child2UpdatedResponse } = await api.items.update(child2Item.id, child2ItemUpdate as EntityUpdate);
@@ -245,6 +258,7 @@ describe("user should be able to create an item and add an attachment", () => {
     const itemUpdate = {
       ...parent,
       parentId: parentLocation.id,
+      entityTypeId: parent.entityType?.id || "",
       tagIds: [],
       syncChildEntityLocations: true,
     };

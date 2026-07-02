@@ -139,7 +139,7 @@
   const locations = computed(() => locationStore.allLocations);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const parent = ref<LocationSummary | any>({});
+  const parent = ref<EntitySummary | any>({});
 
   const { data: _itemsRef, refresh: refreshItemList } = useAsyncData(
     () => locationId.value + "_item_list",
@@ -149,7 +149,7 @@
       }
 
       const resp = await api.items.getAll({
-        locations: [locationId.value],
+        parentIds: [locationId.value],
       });
 
       if (resp.error) {

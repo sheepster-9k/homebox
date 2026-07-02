@@ -195,7 +195,7 @@
       <DropdownMenuItem
         @click="
           openDialog(DialogID.ItemChangeDetails, {
-            params: { items: multi ? multi.items.map(row => row.original) : [item!], changeLocation: true },
+            params: { items: multi ? multi!.items.map(row => row.original) : [item!], changeLocation: true },
             onClose: result => {
               if (result) {
                 toast.success(t('components.item.view.table.dropdown.change_location_success'));
@@ -212,7 +212,7 @@
         @click="
           openDialog(DialogID.ItemChangeDetails, {
             params: {
-              items: multi ? multi.items.map(row => row.original) : [item!],
+              items: multi ? multi!.items.map(row => row.original) : [item!],
               addTags: true,
               removeTags: true,
             },
@@ -231,7 +231,7 @@
       <DropdownMenuItem
         @click="
           openDialog(DialogID.EditMaintenance, {
-            params: { type: 'create', itemId: multi ? multi.items.map(row => row.original.id) : item!.id },
+            params: { type: 'create', itemId: multi ? multi!.items.map(row => row.original.id) : item!.id },
             onClose: result => {
               if (result) {
                 toast.success(t('components.item.view.table.dropdown.create_maintenance_success'));
